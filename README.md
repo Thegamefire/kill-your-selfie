@@ -1,1 +1,1 @@
-# kill-your-selfie
+# Kill your Selfie!
