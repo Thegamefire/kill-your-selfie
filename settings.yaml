@@ -1,0 +1,6 @@
+database-credentials:
+  db_name: "Lol"
+  db_host: ""
+  db_user: ""
+  db_password: ""
+  db_port: ""
