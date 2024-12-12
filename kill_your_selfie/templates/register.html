@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div>
+    <form method="POST" action="/register">
+        <input type="text" name="username" placeholder="New Username" autofocus="">
+        <input type="text" name="email" placeholder="New emai">
+        <input type="password" name="password" placeholder="New Password">
+        <label>Admin?</label><input type="checkbox" name="admin-state">
+        <button type="submit">Register</button>
+    </form>
+    {% with messages = get_flashed_messages()%}
+{% if messages%}
+    {% for message in messages%}
+    <p>{{message}}</p>
+    {%endfor%}
+    {%endif%}
+    {%endwith%}
+</div>
+{% endblock content %}

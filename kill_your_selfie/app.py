@@ -2,15 +2,20 @@ import psycopg2
 import os
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, url_for, flash
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
 
 
 login_manager = LoginManager()
 
 app = Flask(__name__)
 login_manager.init_app(app)
+bcrypt=Bcrypt(app)
 
+print('Hash for lol =')
+lol_hash = bcrypt.generate_password_hash('lol').decode('utf-8')
+print(lol_hash)
 
 load_dotenv()
 db_username = os.environ.get("USER_NAME")
@@ -68,12 +73,35 @@ def login():
             flash("User with that Username doesn't exist")
         # Check if the password entered is the 
         # same as the user's password
-        elif user.password == request.form.get("password"):
+        elif bcrypt.check_password_hash(user.password, request.form.get("password")):
             # Use the login_user method to log in the user
             login_user(user, remember=True)
             return redirect( url_for('homepage'))
+        else:
+            flash('Incorrect password')
     return render_template("login.html")
 
+@app.route('/register', methods=['GET', 'POST'])
+@login_required
+def register():
+    if request.method=='POST':
+        if current_user.admin:
+            pw_hash = bcrypt.generate_password_hash(request.form.get("password")).decode('utf-8')
+            new_user = User(
+                username=request.form.get("username"),
+                email=request.form.get("email"),
+                password=pw_hash,
+                admin={'on':True,None:False}[request.form.get('admin-state')]
+            )
+
+            db.session.add(new_user)
+            db.session.commit()
+            flash('User added')
+            return render_template('register.html')
+        else:
+            flash('Login as admin to register new users')
+    return render_template("register.html")
+    
 
 @app.route('/logout')
 @login_required
