@@ -11,5 +11,11 @@
         kill your selfie !!!
         <img class="header_image" src="../static/assets/images/knife.gif" alt="knife">
     </h1>
+    <a href="{{ url_for('login') }}">Login</a>
+
+    <div>
+        {% block content %}
+        {% endblock %}
+    </div>
 </body>
 </html>
