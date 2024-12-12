@@ -1,0 +1,21 @@
+@import url("colors.css");
+
+html {
+    background-color: var(--bg-color);
+    color: var(--text-primary-color);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    color:lightpink;
+}
+
+img.header_image {
+    height: 1.2em;
+    vertical-align: bottom;
+}

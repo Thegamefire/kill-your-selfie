@@ -2,13 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/index.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/base.css') }}">
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/nav.css') }}">
     <title>{% block title %}Kill Your Selfie{% endblock title %}</title>
 </head>
 <body>
     <div class="navbar">
         <div class="nav-links">
+            <div>
+                <h1 class="nav-title">
+                    <img class="header_image" src="{{ url_for('static',filename='assets/images/knife.gif') }}" alt="knife">
+                    kill your selfie !!!
+                </h1>
+            </div>
+            <div>
+                <p>test</p>
+            </div>
+        </div>
         <div class="user-selector">
             <img src="{{ url_for('static',filename='assets/images/profile-circle.svg') }}" id="user-icon"></img>
 
@@ -20,12 +30,6 @@
         </div>
     </div>
     </div>
-    <h1>
-        <img class="header_image" src="{{ url_for('static',filename='assets/images/knife.gif') }}" alt="knife">
-        kill your selfie !!!
-        <img class="header_image" src="{{ url_for('static',filename='assets/images/knife.gif') }}" alt="knife">
-    </h1>
-    
 
     <div>
         {% block content %}
