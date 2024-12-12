@@ -6,6 +6,7 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from datetime import datetime, timedelta
+import json
 
 
 login_manager = LoginManager()
@@ -14,9 +15,6 @@ app = Flask(__name__)
 login_manager.init_app(app)
 bcrypt=Bcrypt(app)
 
-print('Hash for lol =')
-lol_hash = bcrypt.generate_password_hash('lol').decode('utf-8')
-print(lol_hash)
 
 load_dotenv()
 db_username = os.environ.get("USER_NAME")
@@ -54,9 +52,6 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
-# # Initialize app with extension
-# db.init_app(app)
-# Create database within app context
  
 with app.app_context():
     db.create_all()
@@ -146,6 +141,18 @@ def new_record():
         except ValueError:
             flash('You need to at least fill out Time correctly')
     return render_template("new_record.html", loc_options=loc_options, trgt_options=trgt_options)
+
+
+### Charts
+@app.route('/barweek')
+def weekbar():
+    times=[]
+    query="SELECT TO_CHAR(time, 'DD/MM/YYYY') AS day, COUNT(time) AS amount FROM occurence GROUP BY TO_CHAR(time, 'DD/MM/YYYY')"
+    times = db.engine.execute(query)
+    print(times)
+    return json.dumps(times)
+
+
 
 if __name__ == '__main__':  
    app.run(debug=True)
