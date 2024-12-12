@@ -2,7 +2,7 @@ import psycopg2
 import os
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, url_for, flash
-from flask_login import LoginManager, UserMixin, login_user, logout_user
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
 from sqlalchemy import create_engine
 from flask_sqlalchemy import SQLAlchemy
 
@@ -69,15 +69,15 @@ def login():
         elif user.password == request.form.get("password"):
             # Use the login_user method to log in the user
             login_user(user)
-            return redirect(url_for("homepage"))
-        # Redirect the user back to the home
-        # (we'll create the home route in a moment)
+            return redirect( url_for('homepage'))
     return render_template("login.html")
 
 
 @app.route('/logout')
+@login_required
 def logout():
-    return 'Logout'
+    logout_user()
+    return redirect(url_for('homepage'))
 
 
 if __name__ == '__main__':  
