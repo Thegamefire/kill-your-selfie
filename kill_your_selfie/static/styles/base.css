@@ -1,6 +1,6 @@
 @import url("colors.css");
 
-html {
+:root {
     background-color: var(--bg-color);
     color: var(--text-primary-color);
     font-family: Arial, Helvetica, sans-serif;

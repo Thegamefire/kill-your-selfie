@@ -2,10 +2,10 @@
 
 .navbar {
     height: 40px;
-    padding: 5px;
+    padding: 5px 10px;
     margin: 0;
     background-color: var(--navbar-color);
-    border-bottom: 1px solid var(--navbar-border-color);
+    border-bottom: 1px dashed var(--button-normal-color);
     display:flex;
     flex-direction: row;
     align-items:center;
@@ -16,14 +16,31 @@
     flex-direction: row;
     align-items:center;
     flex-grow: 1;
+    gap: 30px;
 }
 
-h1.nav-title {
+.nav-links a {
+    border: 2px solid #fff0;
+    padding: 7px;
+    font-size: 20px;
+    font-weight: bold;
+    font-style: italic;
+    text-decoration: none;
+    color: var(--button-highlight-color);
+}
+
+.nav-links a.title {
     font-size: 20pt;
     font-style: italic;
-    text-shadow: 2px 2px palevioletred;
-    margin: 0;
-    padding: 0 0px;
+    color: var(--title-color);
+    text-shadow: 2px 2px var(--title-shadow-color);
+}
+
+.nav-links :hover:not(img) {
+    border: 2px solid var(--navbar-border-color);
+    background-color: var(--navbar-border-color);
+    border-radius: 5px;
+    padding: 7px;
 }
 
 .user-selector {

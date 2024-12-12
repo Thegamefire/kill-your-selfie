@@ -9,15 +9,11 @@
 <body>
     <div class="navbar">
         <div class="nav-links">
-            <div>
-                <h1 class="nav-title">
-                    <img class="header_image" src="{{ url_for('static',filename='assets/images/knife.gif') }}" alt="knife">
-                    kill your selfie !!!
-                </h1>
-            </div>
-            <div>
-                <p>test</p>
-            </div>
+            <a class="title" href="{{ url_for('homepage') }}">
+                <img class="header_image" src="{{ url_for('static',filename='assets/images/knife.gif') }}" alt="knife">
+                kill your selfie !!!
+            </a>
+            <a href="{{ url_for('new_record') }}">New record</a>
         </div>
         <div class="user-selector">
             <img src="{{ url_for('static',filename='assets/images/profile-circle.svg') }}" id="user-icon"></img>
