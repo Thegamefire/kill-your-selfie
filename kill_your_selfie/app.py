@@ -98,21 +98,18 @@ def login():
 @login_required
 def register():
     if request.method=='POST':
-        if current_user.admin:
-            pw_hash = bcrypt.generate_password_hash(request.form.get("password")).decode('utf-8')
-            new_user = User(
-                username=request.form.get("username"),
-                email=request.form.get("email"),
-                password=pw_hash,
-                admin={'on':True,None:False}[request.form.get('admin-state')]
-            )
+        pw_hash = bcrypt.generate_password_hash(request.form.get("password")).decode('utf-8')
+        new_user = User(
+            username=request.form.get("username"),
+            email=request.form.get("email"),
+            password=pw_hash,
+            admin={'on':True,None:False}[request.form.get('admin-state')]
+        )
 
-            db.session.add(new_user)
-            db.session.commit()
-            flash('User added')
-            return render_template('register.html')
-        else:
-            flash('Login as admin to register new users')
+        db.session.add(new_user)
+        db.session.commit()
+        flash('User added')
+        return render_template('register.html')
     return render_template("register.html")
     
 

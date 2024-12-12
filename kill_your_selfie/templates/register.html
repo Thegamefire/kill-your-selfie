@@ -2,11 +2,17 @@
 
 {% block title %}Kill Your Selfie - Register New User{% endblock title %}
 
+
 {% block content %}
+
+{% if not current_user.admin %}
+<h5>You need to login as admin to add new users.</h5>
+{% else %}
+
 <div>
     <form method="POST" action="/register">
         <input type="text" name="username" placeholder="New Username" autofocus="">
-        <input type="text" name="email" placeholder="New emai">
+        <input type="text" name="email" placeholder="New email">
         <input type="password" name="password" placeholder="New Password">
         <label>Admin?</label><input type="checkbox" name="admin-state">
         <button type="submit">Register</button>
@@ -19,4 +25,7 @@
     {%endif%}
     {%endwith%}
 </div>
+
+{%endif%}
+
 {% endblock content %}
