@@ -5,6 +5,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+from datetime import datetime, timedelta
 
 
 login_manager = LoginManager()
@@ -28,6 +29,18 @@ secret_key = os.environ.get('SECRET')
 app.config['SQLALCHEMY_DATABASE_URI']=f"postgresql+psycopg2://{db_username}:{db_password}@{db_host}:{db_port}/{db_database}"
 db = SQLAlchemy(app)
 app.config['SECRET_KEY'] = secret_key
+
+
+class Occurence(db.Model):
+    __tablename__ = "occurence"
+    
+    time = db.Column(db.TIMESTAMP, primary_key=True)
+    location = db.Column(db.String(80), unique=False, nullable=True)
+    target = db.Column(db.String(80), unique=False, nullable=False)
+    context = db.Column(db.String(), unique=False, nullable=False)
+    
+    def __repr__(self):
+        return '<Occurence %r>' % self.time
 
 class User(UserMixin, db.Model):
     __tablename__ = "user"
@@ -109,6 +122,33 @@ def logout():
     logout_user()
     return redirect(url_for('homepage'))
 
+
+
+@app.route("/new_record", methods=['GET', 'POST'])
+@login_required
+def new_record():
+    loc_options = []
+    trgt_options = []
+    for occurence in Occurence.query.all():
+        if not occurence.location in loc_options:
+            loc_options.append(occurence.location)
+        if not occurence.target in trgt_options:
+            trgt_options.append(occurence.target)
+    if request.method=='POST':
+        try:
+            time_dt = datetime.strptime(request.form.get('time'), "%Y-%m-%dT%H:%M")
+            new_occ = Occurence(
+                time=time_dt,
+                location=request.form.get('location'),
+                target=request.form.get('target'),
+                context=request.form.get('context')
+                )
+            db.session.add(new_occ)
+            db.session.commit()
+            flash('Occurence added')
+        except ValueError:
+            flash('You need to at least fill out Time correctly')
+    return render_template("new_record.html", loc_options=loc_options, trgt_options=trgt_options)
 
 if __name__ == '__main__':  
    app.run(debug=True)
