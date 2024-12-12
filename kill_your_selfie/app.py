@@ -31,7 +31,8 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    pwd = db.Column(db.String(300), nullable=False, unique=True)
+    password = db.Column(db.String(300), nullable=False, unique=False)
+    admin = db.Column(db.Boolean, nullable=False,unique=False)
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -65,7 +66,7 @@ def login():
             flash("User with that Username doesn't exist")
         # Check if the password entered is the 
         # same as the user's password
-        elif user.pwd == request.form.get("password"):
+        elif user.password == request.form.get("password"):
             # Use the login_user method to log in the user
             login_user(user)
             return redirect(url_for("homepage"))
