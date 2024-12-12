@@ -3,7 +3,6 @@ import os
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
-from sqlalchemy import create_engine
 from flask_sqlalchemy import SQLAlchemy
 
 
@@ -33,7 +32,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(300), nullable=False, unique=False)
     admin = db.Column(db.Boolean, nullable=False,unique=False)
-
+    
     def __repr__(self):
         return '<User %r>' % self.username
 
@@ -50,6 +49,9 @@ with app.app_context():
 def homepage():
     return render_template('index.html')
 
+@app.route('/base')
+def basepage():
+    return render_template('base.html')
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -68,7 +70,7 @@ def login():
         # same as the user's password
         elif user.password == request.form.get("password"):
             # Use the login_user method to log in the user
-            login_user(user)
+            login_user(user, remember=True)
             return redirect( url_for('homepage'))
     return render_template("login.html")
 
