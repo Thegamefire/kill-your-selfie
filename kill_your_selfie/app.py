@@ -63,9 +63,11 @@ with app.app_context():
 
 
 @app.route("/")
-@app.route("/home")
-def homepage():
-    return render_template('index.html')
+def webroot():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    else:
+        return redirect(url_for('login'))
 
 @app.route('/base')
 def basepage():
@@ -93,6 +95,12 @@ def login():
         else:
             flash('Incorrect password')
     return render_template("login.html")
+
+@app.route("/home")
+@login_required
+def homepage():
+    return render_template('index.html')
+
 
 @app.route('/register', methods=['GET', 'POST'])
 @login_required
