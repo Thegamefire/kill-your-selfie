@@ -63,7 +63,7 @@ with app.app_context():
 
 
 @app.route("/")
-def webroot():
+def index():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
     else:
