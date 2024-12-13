@@ -91,19 +91,19 @@ def login():
         elif bcrypt.check_password_hash(user.password, request.form.get("password")):
             # Use the login_user method to log in the user
             login_user(user, remember=True)
-            return redirect( url_for('homepage'))
+            return redirect( url_for('home'))
         else:
             flash('Incorrect password')
     return render_template("login.html")
 
 @app.route("/home")
 @login_required
-def homepage():
+def home():
     return render_template('index.html')
 
 
 @app.route('/register', methods=['GET', 'POST'])
-@login_required
+# @login_required
 def register():
     if request.method=='POST':
         pw_hash = bcrypt.generate_password_hash(request.form.get("password")).decode('utf-8')
@@ -125,7 +125,7 @@ def register():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('homepage'))
+    return redirect(url_for('index'))
 
 
 
