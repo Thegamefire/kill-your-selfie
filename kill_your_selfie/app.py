@@ -79,6 +79,14 @@ with app.app_context():
 def get_SQL_data(query):
     return db.session.execute(sql_txt(query)).fetchall()
 
+def get_location_options():
+    loc_options=[]
+    for location in Location.query.all():
+        if not location.label in loc_options:
+            loc_options.append(location.label)
+    return loc_options
+    
+
 
 @app.route("/")
 def index():
@@ -199,11 +207,9 @@ def logout():
 @app.route("/new_record", methods=["GET", "POST"])
 @login_required
 def new_record():
-    loc_options = []
+    loc_options = get_location_options()
     trgt_options = []
-    for location in Location.query.all():
-        if not location.label in loc_options:
-            loc_options.append(location.label)
+    
     for occurence in Occurence.query.all():
         if not occurence.target in trgt_options:
             trgt_options.append(occurence.target)
@@ -231,6 +237,22 @@ def new_record():
     return render_template(
         "new_record.html", loc_options=loc_options, trgt_options=trgt_options
     )
+
+@app.route("/location_link", methods=["GET", "POST"])
+@login_required
+def location_link():
+    loc_options = get_location_options()
+    loc_options.sort()
+    if len(loc_options) == 0:
+        loc_options=[""] # Add at least one element to the list so it is iterable
+    
+    if request.method == 'POST':
+        location = Location.query.filter_by(label=request.form.get("location")).first()
+        location.latitude = float(request.form.get("latitude"))
+        location.longitude = float(request.form.get("longitude"))
+        db.session.commit()
+    
+    return render_template("location_link.html", loc_options = loc_options)
 
 
 if __name__ == "__main__":
