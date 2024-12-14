@@ -2,14 +2,18 @@
 
 {% block title %}Kill Your Selfie - New Record{% endblock title %}
 
+{% if not current_user.admin %}
+<h5>You need to login as admin to add new users.</h5>
+{% else %}
+
 {% block content %}
 <div>
     <form method="POST" action="/new_record">
         
-        <input type="datetime-local" name="time">
-        <input type="text" name="target" placeholder="Target..." list="targets" autofocus="">
+        <input type="datetime-local" name="time" required>
+        <input type="text" name="target" placeholder="Target..." list="targets" autofocus="" required>
         <input type="text" name="location" list="locations" placeholder="Location..."/>
-        <input type="text" name="context" placeholder="Context...">
+        <input type="text" name="context" placeholder="Context..." required>
         <button type="submit">Submit</button>
 
         <datalist id="targets">
@@ -32,4 +36,6 @@
         {%endif%}
     {%endwith%}
 </div>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 {% endblock content %}
