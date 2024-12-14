@@ -66,11 +66,46 @@ def get_SQL_data(query):
 
 
 @app.route("/")
+def index():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    else:
+        return redirect(url_for('login'))
+
+
+@app.route("/base")
+def basepage():
+    return render_template("base.html")
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    # If a post request was made, find the user by
+    # filtering for the username
+    if request.method == "POST":
+        user = User.query.filter_by(username=request.form.get("username")).first()
+        if user == None:
+            flash("User with that Username doesn't exist")
+        # Check if the password entered is the
+        # same as the user's password
+        elif bcrypt.check_password_hash(user.password, request.form.get("password")):
+            # Use the login_user method to log in the user
+            login_user(user, remember=True)
+            return redirect( url_for('home'))
+        else:
+            flash("Incorrect password")
+    return render_template("login.html")
+
+
 @app.route("/home")
-def homepage():
-
+@login_required
+def home():    
     ### Chart Data
-
     ## Weekly Bar Graph
     weekly_bar_data = []
     occurences_per_day = get_SQL_data(
@@ -106,36 +141,7 @@ def homepage():
     return render_template("index.html", chart_data=weekly_bar_data)
 
 
-@app.route("/base")
-def basepage():
-    return render_template("base.html")
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(user_id)
-
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    # If a post request was made, find the user by
-    # filtering for the username
-    if request.method == "POST":
-        user = User.query.filter_by(username=request.form.get("username")).first()
-        if user == None:
-            flash("User with that Username doesn't exist")
-        # Check if the password entered is the
-        # same as the user's password
-        elif bcrypt.check_password_hash(user.password, request.form.get("password")):
-            # Use the login_user method to log in the user
-            login_user(user, remember=True)
-            return redirect(url_for("homepage"))
-        else:
-            flash("Incorrect password")
-    return render_template("login.html")
-
-
-@app.route("/register", methods=["GET", "POST"])
+@app.route('/register', methods=['GET', 'POST'])
 @login_required
 def register():
     if request.method == "POST":
@@ -160,7 +166,7 @@ def register():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for("homepage"))
+    return redirect(url_for('index'))
 
 
 @app.route("/new_record", methods=["GET", "POST"])
