@@ -6,11 +6,10 @@ import folium
 import folium.plugins
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
-from sqlalchemy import text as sql_txt
 
 from .config import Config
+from . import database
 from . import models
 
 
@@ -24,17 +23,11 @@ bcrypt = Bcrypt(app)
 app.config["SQLALCHEMY_DATABASE_URI"] = (
     f"postgresql+psycopg2://{Config.DB_USERNAME}:{Config.DB_PASSWORD}@{Config.DB_HOST}:{Config.DB_PORT}/{Config.DB_DATABASE}"
 )
-db = SQLAlchemy(app)
 app.config["SECRET_KEY"] = Config.SECRET
 
+database.register_app(app)
+models.create_tables(app)
 
-
-with app.app_context():
-    db.create_all()
-
-
-def get_SQL_data(query):
-    return db.session.execute(sql_txt(query)).fetchall()
 
 def get_location_options():
     loc_options=[]
@@ -88,7 +81,7 @@ def home():
     ### Chart Data
     ## Weekly Bar Graph
     weekly_bar_data = []
-    occurences_per_day = get_SQL_data(
+    occurences_per_day = database.get_sql_data(
         "SELECT DATE_TRUNC('day', time)::date AS day, COUNT(time) AS amount FROM occurence GROUP BY DATE_TRUNC('day', time) ORDER BY DATE_TRUNC('day', time) ASC"
     )
     # filter selection on days from last 7 days
@@ -119,7 +112,7 @@ def home():
 
     ## Location Map
     location_map_data = []
-    occurences_per_location = get_SQL_data(
+    occurences_per_location = database.get_sql_data(
         'SELECT l.label, l.latitude, l.longitude, COUNT(o.time) as amount FROM "location" l JOIN "occurence" o ON o.location_label = l.label GROUP BY l.label, l.latitude, l.longitude'
     )
     for location in occurences_per_location:
@@ -147,8 +140,8 @@ def register():
             admin={"on": True, None: False}[request.form.get("admin-state")],
         )
 
-        db.session.add(new_user)
-        db.session.commit()
+        database.add_object(new_user)
+        database.commit()
         flash("User added")
         return render_template("register.html")
     return render_template("register.html")
@@ -173,21 +166,21 @@ def new_record():
     if request.method == "POST":
         try:
             time_dt = datetime.strptime(request.form.get("time"), "%Y-%m-%dT%H:%M")
-            new_occ = models.Occurence(
+            new_occurence = models.Occurence(
                 time=time_dt,
                 location_label=request.form.get("location"),
                 target=request.form.get("target"),
                 context=request.form.get("context"),
             )
-            if new_occ.location not in loc_options:
-                new_loc = models.Location(
-                    label=new_occ.location_label,
+            if new_occurence.location not in loc_options:
+                new_location = models.Location(
+                    label=new_occurence.location_label,
                     latitude=None,
                     longitude=None
                 )
-                db.session.add(new_loc)
-            db.session.add(new_occ)
-            db.session.commit()
+                database.add_object(new_location)
+            database.add_object(new_occurence)
+            database.commit()
             flash("Occurence added")
         except ValueError:
             flash("You need to at least fill out Time correctly")
@@ -207,6 +200,6 @@ def location_link():
         location = models.Location.query.filter_by(label=request.form.get("location")).first()
         location.latitude = float(request.form.get("latitude"))
         location.longitude = float(request.form.get("longitude"))
-        db.session.commit()
+        database.commit()
 
     return render_template("location_link.html", loc_options = loc_options)

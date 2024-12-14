@@ -1,5 +1,5 @@
 """database models"""
-
+from flask import Flask
 from flask_login import UserMixin
 
 from .database import db
@@ -45,3 +45,9 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return f"<User {self.username}>"
+
+
+def create_tables(app: Flask) -> None:
+    """create tables in database that do not exist yet"""
+    with app.app_context():
+        db.create_all()
