@@ -1,9 +1,9 @@
+"""main app process"""
+# pylint: disable=C0301
 import os
-import json
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
-import psycopg2
 import folium
 import folium.plugins
 from flask import Flask, render_template, request, redirect, url_for, flash
@@ -11,6 +11,8 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from sqlalchemy import text as sql_txt
+
+from .config import Config
 
 
 login_manager = LoginManager()
@@ -20,19 +22,11 @@ login_manager.init_app(app)
 bcrypt = Bcrypt(app)
 
 
-load_dotenv()
-db_username = os.environ.get("USER_NAME")
-db_password = os.environ.get("PASSWORD")
-db_host = os.environ.get("HOST")
-db_port = os.environ.get("PORT")
-db_database = os.environ.get("DATABASE")
-secret_key = os.environ.get("SECRET")
-
 app.config["SQLALCHEMY_DATABASE_URI"] = (
-    f"postgresql+psycopg2://{db_username}:{db_password}@{db_host}:{db_port}/{db_database}"
+    f"postgresql+psycopg2://{Config.DB_USERNAME}:{Config.DB_PASSWORD}@{Config.DB_HOST}:{Config.DB_PORT}/{Config.DB_DATABASE}"
 )
 db = SQLAlchemy(app)
-app.config["SECRET_KEY"] = secret_key
+app.config["SECRET_KEY"] = Config.SECRET
 
 
 class Location(db.Model):
