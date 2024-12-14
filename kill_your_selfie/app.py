@@ -38,8 +38,15 @@ def get_location_options():
 
 
 
+@login_manager.user_loader
+def load_user(user_id):
+    """loads a user probably"""
+    return models.User.query.get(user_id)
+
+
 @app.route("/")
 def index():
+    """webroot, redirects to either home page or login page"""
     if current_user.is_authenticated:
         return redirect(url_for('home'))
     else:
@@ -48,16 +55,13 @@ def index():
 
 @app.route("/base")
 def basepage():
+    """displays the base html template"""
     return render_template("base.html")
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    return models.User.query.get(user_id)
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    """login page"""
     # If a post request was made, find the user by
     # filtering for the username
     if request.method == "POST":
@@ -78,6 +82,7 @@ def login():
 @app.route("/home")
 @login_required
 def home():
+    """home page"""
     ### Chart Data
     ## Weekly Bar Graph
     weekly_bar_data = []
@@ -129,6 +134,7 @@ def home():
 @app.route('/register', methods=['GET', 'POST'])
 @login_required
 def register():
+    """new user register page"""
     if request.method == "POST":
         pw_hash = bcrypt.generate_password_hash(request.form.get("password")).decode(
             "utf-8"
@@ -150,6 +156,7 @@ def register():
 @app.route("/logout")
 @login_required
 def logout():
+    """logs out the user"""
     logout_user()
     return redirect(url_for('index'))
 
@@ -157,6 +164,7 @@ def logout():
 @app.route("/new_record", methods=["GET", "POST"])
 @login_required
 def new_record():
+    """page to register a new occurence"""
     loc_options = get_location_options()
     trgt_options = []
 
@@ -191,6 +199,7 @@ def new_record():
 @app.route("/location_link", methods=["GET", "POST"])
 @login_required
 def location_link():
+    """page to map locations to geographical coordinates"""
     loc_options = get_location_options()
     loc_options.sort()
     if len(loc_options) == 0:
