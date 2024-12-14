@@ -109,7 +109,7 @@ def home():
     ## Weekly Bar Graph
     weekly_bar_data = []
     occurences_per_day = get_SQL_data(
-        "SELECT TO_CHAR(time, 'DD/MM/YYYY')::date AS day, COUNT(time) AS amount FROM occurence GROUP BY TO_CHAR(time, 'DD/MM/YYYY') ORDER BY TO_CHAR(time, 'DD/MM/YYYY')::date ASC"
+        "SELECT DATE_TRUNC('day', time)::date AS day, COUNT(time) AS amount FROM occurence GROUP BY DATE_TRUNC('day', time) ORDER BY DATE_TRUNC('day', time) ASC"
     )
     # filter selection on days from last 7 days
     for day in occurences_per_day:
