@@ -5,6 +5,9 @@
 {% block content %}
     <h1> Homepage </h1>
     <div class="graph-canvas" >
-    <canvas id="bargraph-weekly" data-chart='{{ chart_data|tojson }}'></canvas>
+    <canvas id="bargraph-weekly" data-chart='{{ weekly_bar_data|tojson }}'></canvas>
+    </div>
+    <div class="graph-canvas" >
+        {{ location_map|safe }}
     </div>
 {% endblock content %}
