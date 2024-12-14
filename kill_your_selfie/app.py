@@ -11,6 +11,7 @@ from flask_bcrypt import Bcrypt
 from .config import Config
 from . import database
 from . import models
+from . import util
 
 
 login_manager = LoginManager()
@@ -27,15 +28,6 @@ app.config["SECRET_KEY"] = Config.SECRET
 
 database.register_app(app)
 models.create_tables(app)
-
-
-def get_location_options():
-    loc_options=[]
-    for location in models.Location.query.all():
-        if not location.label in loc_options:
-            loc_options.append(location.label)
-    return loc_options
-
 
 
 @login_manager.user_loader
@@ -165,7 +157,7 @@ def logout():
 @login_required
 def new_record():
     """page to register a new occurence"""
-    loc_options = get_location_options()
+    loc_options = util.get_location_options()
     trgt_options = []
 
     for occurence in models.Occurence.query.all():
@@ -196,11 +188,12 @@ def new_record():
         "new_record.html", loc_options=loc_options, trgt_options=trgt_options
     )
 
+
 @app.route("/location_link", methods=["GET", "POST"])
 @login_required
 def location_link():
     """page to map locations to geographical coordinates"""
-    loc_options = get_location_options()
+    loc_options = util.get_location_options()
     loc_options.sort()
     if len(loc_options) == 0:
         loc_options=[""] # Add at least one element to the list so it is iterable
