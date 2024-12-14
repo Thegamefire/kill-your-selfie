@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Run a debug webserver"""
 from kill_your_selfie.app import app
 
