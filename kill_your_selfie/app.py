@@ -96,9 +96,12 @@ def homepage():
     i = 0
     while i < len(weekdays):
         print(f"at place {i} data: {weekly_bar_data}")
-        if weekdays[i] != weekly_bar_data[i][0]:
+        if i>=len(weekly_bar_data):
+            weekly_bar_data.append((weekdays[i], 0))
+        elif weekdays[i] != weekly_bar_data[i][0]:
             weekly_bar_data.insert(i, (weekdays[i], 0))
         i += 1
+
 
     return render_template("index.html", chart_data=weekly_bar_data)
 
