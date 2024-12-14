@@ -1,15 +1,17 @@
-import folium.plugins
-import psycopg2
 import os
+import json
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
+
+import psycopg2
+import folium
+import folium.plugins
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
-from datetime import datetime, timedelta
-import json
 from sqlalchemy import text as sql_txt
-import folium
+
 
 login_manager = LoginManager()
 
