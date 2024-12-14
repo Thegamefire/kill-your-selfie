@@ -1,8 +1,6 @@
 """main app process"""
 # pylint: disable=C0301
-import os
 from datetime import datetime, timedelta
-from dotenv import load_dotenv
 
 import folium
 import folium.plugins
