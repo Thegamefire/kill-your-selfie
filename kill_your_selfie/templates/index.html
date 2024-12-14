@@ -4,4 +4,7 @@
 
 {% block content %}
 <h1> Homepage </h1>
+<div class="graph-canvas" >
+<canvas id="bargraph-weekly" data-chart='{{ chart_data|tojson }}'></canvas>
+</div>
 {% endblock content %}

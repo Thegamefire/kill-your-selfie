@@ -19,3 +19,8 @@ img.header_image {
     height: 1.2em;
     vertical-align: bottom;
 }
+
+.graph-canvas {
+    width:30vw;
+    height: 30vw;
+}
