@@ -210,7 +210,3 @@ def location_link():
         db.session.commit()
 
     return render_template("location_link.html", loc_options = loc_options)
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
