@@ -7,12 +7,13 @@ from dotenv import load_dotenv
 import folium
 import folium.plugins
 from flask import Flask, render_template, request, redirect, url_for, flash
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from sqlalchemy import text as sql_txt
 
 from .config import Config
+from . import models
 
 
 login_manager = LoginManager()
@@ -29,44 +30,6 @@ db = SQLAlchemy(app)
 app.config["SECRET_KEY"] = Config.SECRET
 
 
-class Location(db.Model):
-    __tablename__ = "location"
-    
-    label = db.Column(db.String(80), primary_key=True)
-    latitude = db.Column(db.Double, unique=False, nullable=True)
-    longitude = db.Column(db.Double, unique=False, nullable=True)
-    
-    occurences = db.relationship("Occurence", back_populates="location")
-    
-    def __repr__(self):
-        return f"<Location {self.label}>"
-
-class Occurence(db.Model):
-    __tablename__ = "occurence"
-
-    time = db.Column(db.TIMESTAMP, primary_key=True)
-    location_label = db.Column(db.String(80), db.ForeignKey('location.label'))
-    target = db.Column(db.String(80), unique=False, nullable=False)
-    context = db.Column(db.String(), unique=False, nullable=False)
-    
-    location = db.relationship("Location", back_populates="occurences")
-
-    def __repr__(self):
-        return "<Occurence %r>" % self.time
-
-
-class User(UserMixin, db.Model):
-    __tablename__ = "user"
-
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(300), nullable=False, unique=False)
-    admin = db.Column(db.Boolean, nullable=False, unique=False)
-
-    def __repr__(self):
-        return "<User %r>" % self.username
-
 
 with app.app_context():
     db.create_all()
@@ -77,11 +40,11 @@ def get_SQL_data(query):
 
 def get_location_options():
     loc_options=[]
-    for location in Location.query.all():
+    for location in models.Location.query.all():
         if not location.label in loc_options:
             loc_options.append(location.label)
     return loc_options
-    
+
 
 
 @app.route("/")
@@ -99,7 +62,7 @@ def basepage():
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(user_id)
+    return models.User.query.get(user_id)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -107,7 +70,7 @@ def login():
     # If a post request was made, find the user by
     # filtering for the username
     if request.method == "POST":
-        user = User.query.filter_by(username=request.form.get("username")).first()
+        user = models.User.query.filter_by(username=request.form.get("username")).first()
         if user == None:
             flash("User with that Username doesn't exist")
         # Check if the password entered is the
@@ -123,7 +86,7 @@ def login():
 
 @app.route("/home")
 @login_required
-def home():    
+def home():
     ### Chart Data
     ## Weekly Bar Graph
     weekly_bar_data = []
@@ -147,7 +110,7 @@ def home():
     ]
     first_day = int((datetime.now() - timedelta(days=7)).strftime("%w")) + 1 # get the index of the first weekday of our selection
     weekdays = weekdays[first_day:] + weekdays[:first_day] # shift the array to start with the first weekday we want
-    
+
     i = 0
     while i < len(weekdays): # add empty weekdays that don't appear in the database
         if i>=len(weekly_bar_data):
@@ -163,12 +126,12 @@ def home():
     )
     for location in occurences_per_location:
         if location[1] != None and location[2] != None: # Coordinates are in database
-            location_map_data.append((location[1], location[2], location[3])) # Add Latitude, Longitude and Amount 
-    
+            location_map_data.append((location[1], location[2], location[3])) # Add Latitude, Longitude and Amount
+
     location_map = folium.Map([51.05, 3.73], zoom_start=6)
     folium.plugins.HeatMap(location_map_data).add_to(location_map)
     location_map_iframe = location_map.get_root()._repr_html_()
-            
+
     return render_template("index.html", weekly_bar_data=weekly_bar_data, location_map=location_map_iframe)
 
 
@@ -179,7 +142,7 @@ def register():
         pw_hash = bcrypt.generate_password_hash(request.form.get("password")).decode(
             "utf-8"
         )
-        new_user = User(
+        new_user = models.User(
             username=request.form.get("username"),
             email=request.form.get("email"),
             password=pw_hash,
@@ -205,21 +168,21 @@ def logout():
 def new_record():
     loc_options = get_location_options()
     trgt_options = []
-    
-    for occurence in Occurence.query.all():
+
+    for occurence in models.Occurence.query.all():
         if not occurence.target in trgt_options:
             trgt_options.append(occurence.target)
     if request.method == "POST":
         try:
             time_dt = datetime.strptime(request.form.get("time"), "%Y-%m-%dT%H:%M")
-            new_occ = Occurence(
+            new_occ = models.Occurence(
                 time=time_dt,
                 location_label=request.form.get("location"),
                 target=request.form.get("target"),
                 context=request.form.get("context"),
             )
             if new_occ.location not in loc_options:
-                new_loc = Location(
+                new_loc = models.Location(
                     label=new_occ.location_label,
                     latitude=None,
                     longitude=None
@@ -241,13 +204,13 @@ def location_link():
     loc_options.sort()
     if len(loc_options) == 0:
         loc_options=[""] # Add at least one element to the list so it is iterable
-    
+
     if request.method == 'POST':
-        location = Location.query.filter_by(label=request.form.get("location")).first()
+        location = models.Location.query.filter_by(label=request.form.get("location")).first()
         location.latitude = float(request.form.get("latitude"))
         location.longitude = float(request.form.get("longitude"))
         db.session.commit()
-    
+
     return render_template("location_link.html", loc_options = loc_options)
 
 
