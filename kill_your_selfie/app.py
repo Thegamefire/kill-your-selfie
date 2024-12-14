@@ -66,7 +66,7 @@ def login():
     # filtering for the username
     if request.method == "POST":
         user = models.User.query.filter_by(username=request.form.get("username")).first()
-        if user == None:
+        if user is None:
             flash("User with that Username doesn't exist")
         # Check if the password entered is the
         # same as the user's password
@@ -121,7 +121,7 @@ def home():
         'SELECT l.label, l.latitude, l.longitude, COUNT(o.time) as amount FROM "location" l JOIN "occurence" o ON o.location_label = l.label GROUP BY l.label, l.latitude, l.longitude'
     )
     for location in occurences_per_location:
-        if location[1] != None and location[2] != None: # Coordinates are in database
+        if location[1] is not None and location[2] is not None: # Coordinates are in database
             location_map_data.append((location[1], location[2], location[3])) # Add Latitude, Longitude and Amount
 
     location_map = folium.Map([51.05, 3.73], zoom_start=6)
