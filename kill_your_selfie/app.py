@@ -103,7 +103,7 @@ def home():
 
 
 @app.route('/register', methods=['GET', 'POST'])
-# @login_required
+@login_required
 def register():
     if request.method=='POST':
         pw_hash = bcrypt.generate_password_hash(request.form.get("password")).decode('utf-8')
