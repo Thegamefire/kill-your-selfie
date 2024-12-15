@@ -5,20 +5,17 @@ from datetime import datetime, timedelta
 import folium
 import folium.plugins
 from flask import Flask, render_template, request, redirect, url_for, flash
-from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from flask_bcrypt import Bcrypt
+from flask_login import LoginManager, logout_user, login_required, current_user
 
 from .config import Config
-from . import database
-from . import models
-from . import util
+from . import database, models, util, auth
 
 
 login_manager = LoginManager()
 
 app = Flask(__name__)
 login_manager.init_app(app)
-bcrypt = Bcrypt(app)
+auth.init_bcrypt(app)
 
 
 app.config["SQLALCHEMY_DATABASE_URI"] = (
@@ -28,6 +25,7 @@ app.config["SECRET_KEY"] = Config.SECRET
 
 database.register_app(app)
 models.create_tables(app)
+
 
 
 @login_manager.user_loader
@@ -54,20 +52,15 @@ def basepage():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """login page"""
-    # If a post request was made, find the user by
-    # filtering for the username
     if request.method == "POST":
-        user = models.User.query.filter_by(username=request.form.get("username")).first()
-        if user is None:
-            flash("User with that Username doesn't exist")
-        # Check if the password entered is the
-        # same as the user's password
-        elif bcrypt.check_password_hash(user.password, request.form.get("password")):
-            # Use the login_user method to log in the user
-            login_user(user, remember=True)
-            return redirect( url_for('home'))
-        else:
-            flash("Incorrect password")
+        match auth.authenticate_user(request.form.get("username"), request.form.get("password")):
+            case "err_not_found":
+                flash("User with that username doesn't exist")
+            case "err_wrong_password":
+                flash("Incorrect password")
+            case "success":
+                return redirect( url_for('home'))
+
     return render_template("login.html")
 
 
@@ -128,7 +121,7 @@ def home():
 def register():
     """new user register page"""
     if request.method == "POST":
-        pw_hash = bcrypt.generate_password_hash(request.form.get("password")).decode(
+        pw_hash = auth._bcrypt.generate_password_hash(request.form.get("password")).decode(
             "utf-8"
         )
         new_user = models.User(
