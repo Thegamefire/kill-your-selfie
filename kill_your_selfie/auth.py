@@ -12,7 +12,17 @@ def init_bcrypt(app: Flask) -> None:
     _bcrypt.init_app(app)
 
 
-def authenticate_user(username: str, password: str) -> str:
+class AuthenticationError(Exception):
+    """Authentication error"""
+    def __init__(self, message):
+        self.message = message
+        super().__init__(message)
+
+    def __str__(self):
+        return f"{self.message}"
+
+
+def authenticate_user(username: str, password: str) -> None:
     """Attempts to authenticate a user.
     Returns:
     - `success` if the user got logged in;
@@ -22,11 +32,11 @@ def authenticate_user(username: str, password: str) -> str:
     # Finds a user by filtering for the username
     user = models.User.query.filter_by(username=username).first()
     if user is None:
-        return "err_not_found"
+        raise AuthenticationError("User with that username doesn't exist")
     # Check if the password entered is the same as the user's password
     if _bcrypt.check_password_hash(user.password, password):
         # Use the login_user method to log in the user
         login_user(user, remember=True)
         return 'success'
 
-    return 'err_wrong_password'
+    raise AuthenticationError("Wrong password")

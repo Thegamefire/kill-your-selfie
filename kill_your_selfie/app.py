@@ -60,16 +60,11 @@ def basepage():
 def login():
     """login page"""
     if request.method == "POST":
-        match auth.authenticate_user(request.form.get("username"), request.form.get("password")):
-            case "err_not_found":
-                flash("User with that username doesn't exist")
-            case "err_wrong_password":
-                flash("Incorrect password")
-            case "success":
-                if (next_url := request.args.get("next")) is None:
-                    return redirect(url_for("home"))
-
-                return redirect(next_url)
+        try:
+            auth.authenticate_user(request.form.get("username"), request.form.get("password"))
+            return redirect(url_for("home") if (next_url := request.args.get("next")) is None else next_url)
+        except auth.AuthenticationError as e:
+            flash(f"Error: {e}")
 
     return render_template("login.html")
 
