@@ -33,6 +33,13 @@ def load_user(user_id):
     """loads a user probably"""
     return models.User.query.get(user_id)
 
+@login_manager.unauthorized_handler
+def unauthorized_callback():
+    """redirect user to login page when they try to access a
+    resource that requires login
+    """
+    return redirect(url_for("login", next=request.endpoint))
+
 
 @app.route("/")
 def index():
@@ -59,7 +66,10 @@ def login():
             case "err_wrong_password":
                 flash("Incorrect password")
             case "success":
-                return redirect( url_for('home'))
+                if (next_url := request.args.get("next")) is None:
+                    return redirect(url_for("home"))
+
+                return redirect(next_url)
 
     return render_template("login.html")
 
