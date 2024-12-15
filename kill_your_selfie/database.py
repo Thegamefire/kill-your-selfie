@@ -1,8 +1,8 @@
 # pylint: disable=C0111
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_sqlalchemy.model import Model
 from sqlalchemy import text as sql_txt
+
 
 db = SQLAlchemy()
 
@@ -17,11 +17,6 @@ def get_sql_data(query) -> None:
     return db.session.execute(sql_txt(query)).fetchall()
 
 
-def add_object(model_object: Model) -> None:
-    """add object to database"""
-    db.session.add(model_object)
-
-
-def commit() -> None:
-    """commit transaction"""
-    db.session.commit()
+add = db.session.add
+commit = db.session.commit
+rollback = db.session.rollback

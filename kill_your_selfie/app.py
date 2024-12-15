@@ -6,6 +6,8 @@ import folium
 import folium.plugins
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, logout_user, login_required, current_user
+import sqlalchemy
+import sqlalchemy.exc
 
 from .config import Config
 from . import database, models, util, auth
@@ -135,10 +137,13 @@ def register():
             password=pw_hash,
             admin={"on": True, None: False}[request.form.get("admin-state")],
         )
-
-        database.add_object(new_user)
-        database.commit()
-        flash("User added")
+        try:
+            database.add(new_user)
+            database.commit()
+            flash("User added")
+        except sqlalchemy.exc.IntegrityError:
+            database.rollback()
+            flash("User with that username already exists")
         return render_template("register.html")
     return render_template("register.html")
 
@@ -176,8 +181,8 @@ def new_record():
                     latitude=None,
                     longitude=None
                 )
-                database.add_object(new_location)
-            database.add_object(new_occurence)
+                database.add(new_location)
+            database.add(new_occurence)
             database.commit()
             flash("Occurence added")
         except ValueError:
