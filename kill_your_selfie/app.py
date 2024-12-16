@@ -10,7 +10,7 @@ import sqlalchemy
 import sqlalchemy.exc
 
 from .config import Config
-from . import database, models, util, auth
+from . import database, models, util, auth, stats
 
 
 login_manager = LoginManager()
@@ -75,52 +75,11 @@ def login():
 @login_required
 def home():
     """home page"""
-    ### Chart Data
-    ## Weekly Bar Graph
-    weekly_bar_data = []
-    occurences_per_day = database.get_sql_data(
-        "SELECT DATE_TRUNC('day', time)::date AS day, COUNT(time) AS amount FROM occurence GROUP BY DATE_TRUNC('day', time) ORDER BY DATE_TRUNC('day', time) ASC"
+    return render_template(
+        "index.html",
+        weekly_bar_data=stats.weekly_bar_data(),
+        location_map=stats.location_map_data(),
     )
-    # filter selection on days from last 7 days
-    for day in occurences_per_day:
-        if (day[0] >= (datetime.now() - timedelta(days=7)).date() and day[0] <= datetime.now().date()):
-            weekly_bar_data.append((day[0].strftime("%A"), day[1])) # add tuple consisting of name of weekday and amount of uses on that day
-
-    # add the weekdays without entries to the data
-    weekdays = [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-    ]
-    first_day = int((datetime.now() - timedelta(days=7)).strftime("%w")) + 1 # get the index of the first weekday of our selection
-    weekdays = weekdays[first_day:] + weekdays[:first_day] # shift the array to start with the first weekday we want
-
-    i = 0
-    while i < len(weekdays): # add empty weekdays that don't appear in the database
-        if i>=len(weekly_bar_data):
-            weekly_bar_data.append((weekdays[i], 0))
-        elif weekdays[i] != weekly_bar_data[i][0]:
-            weekly_bar_data.insert(i, (weekdays[i], 0))
-        i += 1
-
-    ## Location Map
-    location_map_data = []
-    occurences_per_location = database.get_sql_data(
-        'SELECT l.label, l.latitude, l.longitude, COUNT(o.time) as amount FROM "location" l JOIN "occurence" o ON o.location_label = l.label GROUP BY l.label, l.latitude, l.longitude'
-    )
-    for location in occurences_per_location:
-        if location[1] is not None and location[2] is not None: # Coordinates are in database
-            location_map_data.append((location[1], location[2], location[3])) # Add Latitude, Longitude and Amount
-
-    location_map = folium.Map([51.05, 3.73], zoom_start=6)
-    folium.plugins.HeatMap(location_map_data).add_to(location_map)
-    location_map_iframe = location_map.get_root()._repr_html_()
-
-    return render_template("index.html", weekly_bar_data=weekly_bar_data, location_map=location_map_iframe)
 
 
 @app.route('/register', methods=['GET', 'POST'])

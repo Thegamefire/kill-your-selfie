@@ -23,9 +23,11 @@ class UserExistsError(Exception):
     def __init__(self, *args):
         super().__init__(*args)
 
+
 def init_bcrypt(app: Flask) -> None:
     """initialise bcrypt with app (calls init_app on Bcrypt object)"""
     _bcrypt.init_app(app)
+
 
 def authenticate_user(username: str, password: str) -> None:
     """Attempts to authenticate a user.
