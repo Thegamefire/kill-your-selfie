@@ -110,12 +110,12 @@ def logout():
 @login_required
 def new_record():
     """page to register a new occurence"""
-    loc_options = util.get_location_options()
-    trgt_options = []
+    location_options = util.get_location_options()
+    target_options = []
 
     for occurence in models.Occurence.query.all():
-        if not occurence.target in trgt_options:
-            trgt_options.append(occurence.target)
+        if not occurence.target in target_options:
+            target_options.append(occurence.target)
     if request.method == "POST":
         try:
             time_dt = datetime.strptime(request.form.get("time"), "%Y-%m-%dT%H:%M")
@@ -125,7 +125,7 @@ def new_record():
                 target=request.form.get("target"),
                 context=request.form.get("context"),
             )
-            if new_occurence.location not in loc_options:
+            if new_occurence.location not in location_options:
                 new_location = models.Location(
                     label=new_occurence.location_label,
                     latitude=None,
@@ -138,7 +138,8 @@ def new_record():
         except ValueError:
             flash("You need to at least fill out Time correctly")
     return render_template(
-        "new_record.html", loc_options=loc_options, trgt_options=trgt_options
+        "new_record.html", location_options=location_options, target_options=target_options
+
     )
 
 
