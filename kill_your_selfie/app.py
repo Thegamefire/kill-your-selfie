@@ -1,13 +1,9 @@
 """main app process"""
 # pylint: disable=C0301
-from datetime import datetime, timedelta
+from datetime import datetime
 
-import folium
-import folium.plugins
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, logout_user, login_required, current_user
-import sqlalchemy
-import sqlalchemy.exc
 
 from .config import Config
 from . import database, models, auth, stats, occurences
