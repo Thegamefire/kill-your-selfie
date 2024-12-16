@@ -1,10 +1,13 @@
-# pylint: disable=C0111
+"""functions for database interaction"""
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text as sql_txt
 
-
 db = SQLAlchemy()
+
+add = db.session.add
+commit = db.session.commit
+rollback = db.session.rollback
 
 
 def register_app(app: Flask) -> None:
@@ -15,8 +18,3 @@ def register_app(app: Flask) -> None:
 def get_sql_data(query) -> None:
     """get data from raw SQL query"""
     return db.session.execute(sql_txt(query)).fetchall()
-
-
-add = db.session.add
-commit = db.session.commit
-rollback = db.session.rollback

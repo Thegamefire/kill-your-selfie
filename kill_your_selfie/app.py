@@ -128,23 +128,14 @@ def home():
 def register():
     """new user register page"""
     if request.method == "POST":
-        pw_hash = auth._bcrypt.generate_password_hash(request.form.get("password")).decode(
-            "utf-8"
+        auth.create_user(
+            request.form.get("username"),
+            request.form.get("email"),
+            request.form.get("password"),
+            request.form.get("admin-state") == "on",
         )
-        new_user = models.User(
-            username=request.form.get("username"),
-            email=request.form.get("email"),
-            password=pw_hash,
-            admin={"on": True, None: False}[request.form.get("admin-state")],
-        )
-        try:
-            database.add(new_user)
-            database.commit()
-            flash("User added")
-        except sqlalchemy.exc.IntegrityError:
-            database.rollback()
-            flash("User with that username already exists")
-        return render_template("register.html")
+        flash("User added")
+
     return render_template("register.html")
 
 
