@@ -78,9 +78,9 @@ def home():
     )
 
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/new-user', methods=['GET', 'POST'])
 @login_required
-def register():
+def new_user():
     """new user register page"""
     if request.method == "POST":
         auth.create_user(
@@ -91,7 +91,7 @@ def register():
         )
         flash("User added")
 
-    return render_template("register.html")
+    return render_template("new_user.html")
 
 
 @app.route("/logout")
@@ -102,9 +102,9 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route("/new_record", methods=["GET", "POST"])
+@app.route("/new-occurence", methods=["GET", "POST"])
 @login_required
-def new_record():
+def new_occurence():
     """page to register a new occurence"""
     if request.method == "POST":
         occurences.add_occurence(
@@ -117,15 +117,15 @@ def new_record():
         )
 
     return render_template(
-        "new_record.html",
+        "new_occurence.html",
         location_options=occurences.get_location_options(),
         target_options=occurences.get_target_options(),
     )
 
 
-@app.route("/location_link", methods=["GET", "POST"])
+@app.route("/map-location", methods=["GET", "POST"])
 @login_required
-def location_link():
+def map_location():
     """page to map locations to geographical coordinates"""
     location_options = occurences.get_location_options()
     location_options.sort()
@@ -140,6 +140,6 @@ def location_link():
         )
 
     return render_template(
-        "location_link.html",
+        "map_location.html",
         loc_options = location_options
     )
