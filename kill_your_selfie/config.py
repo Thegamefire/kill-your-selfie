@@ -8,10 +8,9 @@ load_dotenv()
 
 class Config:
     """app configuration"""
-    DB_DATABASE = environ.get
     DB_USERNAME = environ.get("DB_USERNAME")
     DB_PASSWORD = environ.get("DB_PASSWORD")
     DB_HOST = environ.get("DB_HOST")
     DB_PORT = environ.get("DB_PORT")
     DB_DATABASE = environ.get("DB_DATABASE")
-    SECRET = urandom(32)
+    SECRET = secret if (secret := environ.get("KYSIE_DEBUG_SECRET")) else urandom(32)
