@@ -44,3 +44,11 @@ def add_occurence(time: datetime.datetime, location: str, target: str, context: 
         database.add(new_location)
     database.add(new_occurence)
     database.commit()
+
+
+def map_location(location: str, latitude: float, longitude: float) -> None:
+    """Map a location to geographical coordinates"""
+    location = models.Location.query.filter_by(label=location).first()
+    location.latitude = latitude
+    location.longitude = longitude
+    database.commit()

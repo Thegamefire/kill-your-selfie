@@ -10,7 +10,7 @@ import sqlalchemy
 import sqlalchemy.exc
 
 from .config import Config
-from . import database, models, auth, occurences, stats
+from . import database, models, auth, stats, occurences
 
 
 login_manager = LoginManager()
@@ -124,7 +124,6 @@ def new_record():
         "new_record.html",
         location_options=occurences.get_location_options(),
         target_options=occurences.get_target_options(),
-
     )
 
 
@@ -132,15 +131,19 @@ def new_record():
 @login_required
 def location_link():
     """page to map locations to geographical coordinates"""
-    loc_options = occurences.get_location_options()
-    loc_options.sort()
-    if len(loc_options) == 0:
-        loc_options=[""] # Add at least one element to the list so it is iterable
+    location_options = occurences.get_location_options()
+    location_options.sort()
+    if len(location_options) == 0:
+        location_options=[""] # Add at least one element to the list so it is iterable
 
     if request.method == 'POST':
-        location = models.Location.query.filter_by(label=request.form.get("location")).first()
-        location.latitude = float(request.form.get("latitude"))
-        location.longitude = float(request.form.get("longitude"))
-        database.commit()
+        occurences.map_location(
+            request.form.get("location"),
+            float(request.form.get("latitude")),
+            float(request.form.get("longitude")),
+        )
 
-    return render_template("location_link.html", loc_options = loc_options)
+    return render_template(
+        "location_link.html",
+        loc_options = location_options
+    )
