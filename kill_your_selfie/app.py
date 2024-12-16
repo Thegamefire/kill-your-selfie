@@ -67,6 +67,14 @@ def login():
     return render_template("login.html")
 
 
+@app.route("/logout")
+@login_required
+def logout():
+    """logs out the user"""
+    logout_user()
+    return redirect(url_for('index'))
+
+
 @app.route("/home")
 @login_required
 def home():
@@ -92,14 +100,6 @@ def new_user():
         flash("User added")
 
     return render_template("new_user.html")
-
-
-@app.route("/logout")
-@login_required
-def logout():
-    """logs out the user"""
-    logout_user()
-    return redirect(url_for('index'))
 
 
 @app.route("/new-occurence", methods=["GET", "POST"])
