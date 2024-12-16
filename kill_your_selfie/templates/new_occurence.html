@@ -8,8 +8,8 @@
 
 {% block content %}
 <div>
-    <form method="POST" action="/new_record">
-        
+    <form method="POST" action="/new-occurence">
+
         <input type="datetime-local" name="time" required>
         <input type="text" name="target" placeholder="Target..." list="targets" autofocus="" required>
         <input type="text" name="location" list="locations" placeholder="Location..."/>
@@ -17,12 +17,12 @@
         <button type="submit">Submit</button>
 
         <datalist id="targets">
-            {% for option in trgt_options %}
+            {% for option in target_options %}
             <option>{{ option }}</option>
             {% endfor %}
         </datalist>
         <datalist id="locations">
-            {% for option in loc_options %}
+            {% for option in location_options %}
             <option>{{ option }}</option>
             {% endfor %}
         </datalist>

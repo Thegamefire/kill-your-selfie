@@ -1,16 +1,12 @@
 """main app process"""
 # pylint: disable=C0301
-from datetime import datetime, timedelta
+from datetime import datetime
 
-import folium
-import folium.plugins
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, logout_user, login_required, current_user
-import sqlalchemy
-import sqlalchemy.exc
 
 from .config import Config
-from . import database, models, util, auth, stats
+from . import database, models, auth, stats, occurences
 
 
 login_manager = LoginManager()
@@ -64,11 +60,19 @@ def login():
     if request.method == "POST":
         try:
             auth.authenticate_user(request.form.get("username"), request.form.get("password"))
-            return redirect(url_for("home") if (next_url := request.args.get("next")) is None else next_url)
+            return redirect(url_for("home") if (next_url := url_for(request.args.get("next"))) is None else next_url)
         except auth.AuthenticationError as e:
             flash(f"Error: {e}")
 
     return render_template("login.html")
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    """logs out the user"""
+    logout_user()
+    return redirect(url_for('index'))
 
 
 @app.route("/home")
@@ -82,9 +86,9 @@ def home():
     )
 
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/new-user', methods=['GET', 'POST'])
 @login_required
-def register():
+def new_user():
     """new user register page"""
     if request.method == "POST":
         auth.create_user(
@@ -95,66 +99,47 @@ def register():
         )
         flash("User added")
 
-    return render_template("register.html")
+    return render_template("new_user.html")
 
 
-@app.route("/logout")
+@app.route("/new-occurence", methods=["GET", "POST"])
 @login_required
-def logout():
-    """logs out the user"""
-    logout_user()
-    return redirect(url_for('index'))
-
-
-@app.route("/new_record", methods=["GET", "POST"])
-@login_required
-def new_record():
+def new_occurence():
     """page to register a new occurence"""
-    loc_options = util.get_location_options()
-    trgt_options = []
-
-    for occurence in models.Occurence.query.all():
-        if not occurence.target in trgt_options:
-            trgt_options.append(occurence.target)
     if request.method == "POST":
-        try:
-            time_dt = datetime.strptime(request.form.get("time"), "%Y-%m-%dT%H:%M")
-            new_occurence = models.Occurence(
-                time=time_dt,
-                location_label=request.form.get("location"),
-                target=request.form.get("target"),
-                context=request.form.get("context"),
-            )
-            if new_occurence.location not in loc_options:
-                new_location = models.Location(
-                    label=new_occurence.location_label,
-                    latitude=None,
-                    longitude=None
-                )
-                database.add(new_location)
-            database.add(new_occurence)
-            database.commit()
-            flash("Occurence added")
-        except ValueError:
-            flash("You need to at least fill out Time correctly")
+        occurences.add_occurence(
+            # exception handling for datetime is not really needed since
+            # form has built in validation
+            datetime.strptime(request.form.get("time"), "%Y-%m-%dT%H:%M"),
+            request.form.get("location"),
+            request.form.get("target"),
+            request.form.get("context"),
+        )
+
     return render_template(
-        "new_record.html", loc_options=loc_options, trgt_options=trgt_options
+        "new_occurence.html",
+        location_options=occurences.get_location_options(),
+        target_options=occurences.get_target_options(),
     )
 
 
-@app.route("/location_link", methods=["GET", "POST"])
+@app.route("/map-location", methods=["GET", "POST"])
 @login_required
-def location_link():
+def map_location():
     """page to map locations to geographical coordinates"""
-    loc_options = util.get_location_options()
-    loc_options.sort()
-    if len(loc_options) == 0:
-        loc_options=[""] # Add at least one element to the list so it is iterable
+    location_options = occurences.get_location_options()
+    location_options.sort()
+    if len(location_options) == 0:
+        location_options=[""] # Add at least one element to the list so it is iterable
 
     if request.method == 'POST':
-        location = models.Location.query.filter_by(label=request.form.get("location")).first()
-        location.latitude = float(request.form.get("latitude"))
-        location.longitude = float(request.form.get("longitude"))
-        database.commit()
+        occurences.map_location(
+            request.form.get("location"),
+            float(request.form.get("latitude")),
+            float(request.form.get("longitude")),
+        )
 
-    return render_template("location_link.html", loc_options = loc_options)
+    return render_template(
+        "map_location.html",
+        loc_options = location_options
+    )
