@@ -10,7 +10,7 @@ import sqlalchemy
 import sqlalchemy.exc
 
 from .config import Config
-from . import database, models, util, auth, stats
+from . import database, models, auth, occurences, stats
 
 
 login_manager = LoginManager()
@@ -110,35 +110,20 @@ def logout():
 @login_required
 def new_record():
     """page to register a new occurence"""
-    location_options = util.get_location_options()
-    target_options = []
-
-    for occurence in models.Occurence.query.all():
-        if not occurence.target in target_options:
-            target_options.append(occurence.target)
     if request.method == "POST":
-        try:
-            time_dt = datetime.strptime(request.form.get("time"), "%Y-%m-%dT%H:%M")
-            new_occurence = models.Occurence(
-                time=time_dt,
-                location_label=request.form.get("location"),
-                target=request.form.get("target"),
-                context=request.form.get("context"),
-            )
-            if new_occurence.location not in location_options:
-                new_location = models.Location(
-                    label=new_occurence.location_label,
-                    latitude=None,
-                    longitude=None
-                )
-                database.add(new_location)
-            database.add(new_occurence)
-            database.commit()
-            flash("Occurence added")
-        except ValueError:
-            flash("You need to at least fill out Time correctly")
+        occurences.add_occurence(
+            # exception handling for datetime is not really needed since
+            # form has built in validation
+            datetime.strptime(request.form.get("time"), "%Y-%m-%dT%H:%M"),
+            request.form.get("location"),
+            request.form.get("target"),
+            request.form.get("context"),
+        )
+
     return render_template(
-        "new_record.html", location_options=location_options, target_options=target_options
+        "new_record.html",
+        location_options=occurences.get_location_options(),
+        target_options=occurences.get_target_options(),
 
     )
 
@@ -147,7 +132,7 @@ def new_record():
 @login_required
 def location_link():
     """page to map locations to geographical coordinates"""
-    loc_options = util.get_location_options()
+    loc_options = occurences.get_location_options()
     loc_options.sort()
     if len(loc_options) == 0:
         loc_options=[""] # Add at least one element to the list so it is iterable
