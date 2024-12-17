@@ -143,6 +143,6 @@ def map_location():
 
     return render_template(
         "map_location.html",
-        active="new-location",
+        active="map-location",
         loc_options = location_options,
     )
