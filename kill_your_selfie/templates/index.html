@@ -11,3 +11,7 @@
         {{ location_map|safe }}
     </div>
 {% endblock content %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='scripts/weekly-bar-graph.js') }}"></script>
+{%endblock scripts%}

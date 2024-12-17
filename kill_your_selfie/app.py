@@ -79,6 +79,7 @@ def logout():
 @login_required
 def home():
     """home page"""
+    stats.statistics_overview_data() # Testing Statement
     return render_template(
         "index.html",
         weekly_bar_data=stats.weekly_bar_data(),
