@@ -28,21 +28,19 @@ def weekly_bar_data() -> list:
         "Friday",
         "Saturday",
     ]
-    
+
     for i in range(7):
         if len(occurences_per_week) <=i:
             occurences_per_week.insert(i, (i, 0))
         elif occurences_per_week[i][0] != i:
             occurences_per_week.insert(i, (i, 0))
-            
+
     occurences_per_week=occurences_per_week[1:] + occurences_per_week[:1]
-    
+
     for day in occurences_per_week:
         print(f">>>{day[0]} {day[1]}")
         data.append((weekdays[int(day[0])], day[1]))
-    
-    
-    
+
     return data
 
 
@@ -68,9 +66,12 @@ def location_map_data() -> str:
 
     location_map = folium.Map([51.05, 3.73], zoom_start=6)
     folium.plugins.HeatMap(data).add_to(location_map)
-    return location_map.get_root()._repr_html_()  # TODO: use different function because _repr_html_ is protected
+    # pylint: disable=W0212
+    return location_map.get_root()._repr_html_()
 
-def statistics_overview_data():
+
+def statistics_overview_data() -> dict:
+    """Returns dictionary with data for statistics overview"""
     data = {}
     ## Get Streaks of sequential dates on which it occured
     streaks = database.get_sql_data(
@@ -124,7 +125,7 @@ def statistics_overview_data():
     ## Day With Most Occurences
     max_days_query = database.get_sql_data(
         """
-        SELECT date_trunc('day', o.time) AS date, 
+        SELECT date_trunc('day', o.time) AS date,
             COUNT(o.time) AS amount
         FROM occurence o
         GROUP BY date_trunc('day', o.time)
@@ -179,5 +180,5 @@ def statistics_overview_data():
         """
     )
     data["Difference with Last Week"] = week_gains[0][0]
-    
+
     print(data)
