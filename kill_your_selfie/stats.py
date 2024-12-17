@@ -9,26 +9,16 @@ from . import database
 
 def weekly_bar_data() -> list:
     """Data for weekly bar graph"""
-    data = []
-    occurences_per_day = database.get_sql_data(
-        """SELECT
-            DATE_TRUNC('day', time)::date AS day,
-            COUNT(time) AS amount
-        FROM occurence
-        GROUP BY DATE_TRUNC('day', time)
-        ORDER BY DATE_TRUNC('day', time) ASC
+    data=[]
+    occurences_per_week = database.get_sql_data(
+        """
+        SELECT extract(dow FROM o.time) AS DAY,
+            count(o.time) AS amount
+        FROM occurence o
+        WHERE extract('week' FROM o.time) = extract('week' FROM now())-1
+        GROUP BY o.time
         """
     )
-    # filter selection on days from last 7 days
-    for day in occurences_per_day:
-        if (
-            day[0] >= (datetime.now() - timedelta(days=7)).date()
-            and day[0] <= datetime.now().date()
-        ):
-            # add tuple consisting of name of weekday and amount of uses on that day
-            data.append((day[0].strftime("%A"), day[1]))
-
-    # add the weekdays without entries to the data
     weekdays = [
         "Sunday",
         "Monday",
@@ -38,19 +28,21 @@ def weekly_bar_data() -> list:
         "Friday",
         "Saturday",
     ]
-    # get the index of the first weekday of our selection
-    first_day = int((datetime.now() - timedelta(days=7)).strftime("%w")) + 1
-    # shift the array to start with the first weekday we want
-    weekdays = weekdays[first_day:] + weekdays[:first_day]
-
-    i = 0
-    while i < len(weekdays): # add empty weekdays that don't appear in the database
-        if i>=len(data):
-            data.append((weekdays[i], 0))
-        elif weekdays[i] != data[i][0]:
-            data.insert(i, (weekdays[i], 0))
-        i += 1
-
+    
+    for i in range(7):
+        if len(occurences_per_week) <=i:
+            occurences_per_week.insert(i, (i, 0))
+        elif occurences_per_week[i][0] != i:
+            occurences_per_week.insert(i, (i, 0))
+            
+    occurences_per_week=occurences_per_week[1:] + occurences_per_week[:1]
+    
+    for day in occurences_per_week:
+        print(f">>>{day[0]} {day[1]}")
+        data.append((weekdays[int(day[0])], day[1]))
+    
+    
+    
     return data
 
 
@@ -182,8 +174,8 @@ def statistics_overview_data():
             GROUP BY extract('week' FROM o.time))
         SELECT weeks.amount-weeks2.amount AS difference
         FROM weeks
-        JOIN weeks AS weeks2 ON extract('week' FROM now()-interval '7 days') = weeks2.week
-        WHERE weeks.week = extract('week' FROM now())
+        JOIN weeks AS weeks2 ON weeks.week-1 = weeks2.week
+        WHERE weeks.week = extract('week' FROM now())-1
         """
     )
     data["Difference with Last Week"] = week_gains[0][0]
