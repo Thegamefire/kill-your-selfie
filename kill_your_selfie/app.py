@@ -60,7 +60,7 @@ def login():
     if request.method == "POST":
         try:
             auth.authenticate_user(request.form.get("username"), request.form.get("password"))
-            return redirect(url_for("home") if (next_url := url_for(request.args.get("next"))) is None else next_url)
+            return redirect(url_for("home") if (next_url := request.args.get("next")) is None else url_for(next_url))
         except auth.AuthenticationError as e:
             flash(f"Error: {e}")
 
