@@ -8,33 +8,33 @@
 
 {% block content %}
 <div>
-    <form method="POST" action="/new-occurence">
+  <form method="POST" action="/new-occurence">
 
-        <input type="datetime-local" name="time" required>
-        <input type="text" name="target" placeholder="Target..." list="targets" autofocus="" required>
-        <input type="text" name="location" list="locations" placeholder="Location..."/>
-        <input type="text" name="context" placeholder="Context..." required>
-        <button type="submit">Submit</button>
+    <input type="datetime-local" name="time" required>
+    <input type="text" name="target" placeholder="Target..." list="targets" autofocus="" required>
+    <input type="text" name="location" list="locations" placeholder="Location..."/>
+    <input type="text" name="context" placeholder="Context..." required>
+    <button type="submit">Submit</button>
 
-        <datalist id="targets">
-            {% for option in target_options %}
-            <option>{{ option }}</option>
-            {% endfor %}
-        </datalist>
-        <datalist id="locations">
-            {% for option in location_options %}
-            <option>{{ option }}</option>
-            {% endfor %}
-        </datalist>
-    </form>
+    <datalist id="targets">
+      {% for option in target_options %}
+      <option>{{ option }}</option>
+      {% endfor %}
+    </datalist>
+    <datalist id="locations">
+      {% for option in location_options %}
+      <option>{{ option }}</option>
+      {% endfor %}
+    </datalist>
+  </form>
 
-    {% with messages = get_flashed_messages()%}
-        {% if messages%}
-            {% for message in messages%}
-                <p>{{message}}</p>
-            {%endfor%}
-        {%endif%}
-    {%endwith%}
+  {% with messages = get_flashed_messages()%}
+    {% if messages%}
+      {% for message in messages%}
+        <p>{{message}}</p>
+      {%endfor%}
+    {%endif%}
+  {%endwith%}
 </div>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
