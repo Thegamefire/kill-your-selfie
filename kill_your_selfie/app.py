@@ -81,6 +81,7 @@ def home():
     """home page"""
     return render_template(
         "index.html",
+        active="home",
         weekly_bar_data=stats.weekly_bar_data(),
         location_map=stats.location_map_data(),
     )
@@ -99,7 +100,7 @@ def new_user():
         )
         flash("User added")
 
-    return render_template("new_user.html")
+    return render_template("new_user.html", active="new-user")
 
 
 @app.route("/new-occurence", methods=["GET", "POST"])
@@ -118,6 +119,7 @@ def new_occurence():
 
     return render_template(
         "new_occurence.html",
+        active="new-occurence",
         location_options=occurences.get_location_options(),
         target_options=occurences.get_target_options(),
     )
@@ -141,5 +143,6 @@ def map_location():
 
     return render_template(
         "map_location.html",
-        loc_options = location_options
+        active="new-location",
+        loc_options = location_options,
     )
