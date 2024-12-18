@@ -1,31 +1,25 @@
 {% extends "base.html" %}
-
-{% block title %}Kill Your Selfie - Register New User{% endblock title %}
-
+{% set page_title = "New user" %}
 
 {% block content %}
-
-{% if not current_user.admin %}
-<h5>You need to login as admin to add new users.</h5>
-{% else %}
-
-<div>
-  <form method="POST" action="/new-user">
-    <input type="text" name="username" placeholder="New Username" autofocus="">
-    <input type="text" name="email" placeholder="New email">
-    <input type="password" name="password" placeholder="New Password">
-    <label>Admin?</label><input type="checkbox" name="admin-state">
-    <button type="submit">Register</button>
-  </form>
-  {% with messages = get_flashed_messages()%}
-{% if messages%}
-  {% for message in messages%}
-  <p>{{message}}</p>
-  {%endfor%}
+  {% if not current_user.admin %}
+    <h5>You need to login as admin to add new users.</h5>
+  {% else %}
+    <div>
+      <form method="POST" action="/new-user">
+        <input type="text" name="username" placeholder="New Username" autofocus="">
+        <input type="text" name="email" placeholder="New email">
+        <input type="password" name="password" placeholder="New Password">
+        <label>Admin?</label><input type="checkbox" name="admin-state">
+        <button type="submit">Register</button>
+      </form>
+      {% with messages = get_flashed_messages()%}
+        {% if messages%}
+          {% for message in messages%}
+            <p>{{message}}</p>
+          {%endfor%}
+        {%endif%}
+      {%endwith%}
+    </div>
   {%endif%}
-  {%endwith%}
-</div>
-
-{%endif%}
-
 {% endblock content %}
