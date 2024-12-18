@@ -1,13 +1,43 @@
 {% extends "base.html" %}
+{% set page_title = "Home" %}
 
-{% block title %}Kill Your Selfie - Home{% endblock title %}
+{% block title %}{{page_title}}{% endblock title %}
+{% block body_title %}{{page_title}}{% endblock body_title %}
+
+{% block header_items %}
+  <div class="btn-toolbar mb-2 mb-md-0">
+    <div class="btn-group me-2">
+      <button type="button" class="btn btn-sm btn-outline-secondary">Example</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary">buttons</button>
+    </div>
+    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-1">
+      This week
+    </button>
+  </div>
+{% endblock header_items %}
 
 {% block content %}
-  <h1> Homepage </h1>
-  <div class="graph-canvas" >
-  <canvas id="bargraph-weekly" data-chart='{{ weekly_bar_data|tojson }}'></canvas>
-  </div>
-  <div class="graph-canvas" >
-    {{ location_map|safe }}
+  <div class="row row-cols-1 row-cols-lg-2 g-4">
+
+    <div class="col">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Special title treatment</h5>
+          <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+            <canvas id="bargraph-weekly" data-chart='{{ weekly_bar_data|tojson }}'></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Special title treatment</h5>
+          <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+            {{ location_map|safe }}
+        </div>
+      </div>
+    </div>
+
   </div>
 {% endblock content %}

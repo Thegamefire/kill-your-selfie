@@ -1,6 +1,6 @@
 
 function createSimpleBarGraph(canvas, name, data) {
-// Creates a bar graph on the canvas expecting data in the form of 
+// Creates a bar graph on the canvas expecting data in the form of
 // {(label, value), (label, value), (label, value)}
 
   let labels=[]
