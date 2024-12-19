@@ -29,6 +29,13 @@
         {% block header_items %}
         {% endblock header_items %}
       </div>
+      {% with messages = get_flashed_messages()%}  <!-- put this in a fancy bootstrap callout -->
+        {% if messages%}
+          {% for message in messages%}
+            <p>{{message}}</p>
+          {%endfor%}
+        {%endif%}
+      {%endwith%}
       {% block content %}
 
       {% endblock content %}
