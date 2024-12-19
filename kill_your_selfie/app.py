@@ -79,7 +79,6 @@ def logout():
 @login_required
 def home():
     """home page"""
-    flash("test")
     return render_template(
         "index.html",
         active="home",

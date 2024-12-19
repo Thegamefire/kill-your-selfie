@@ -71,9 +71,9 @@ def create_user(username: str, email: str, password: str, admin: bool = False) -
 
 def admin_required(func):
     """Decorator to make a page only accessible to admins"""
-    def admin_gate():
+    def admin_gate(*args, **kwargs):
         if current_user.admin:
-            func()
+            return func(*args, **kwargs)
         else:
             abort(401, description="You need to be admin to access this page")
     admin_gate.__name__ = func.__name__
