@@ -53,6 +53,55 @@ def weekly_bar_data() -> list:
 
     return data
 
+def line_data(range) -> list:
+    data=[]
+    match range:
+        case 'month':
+            # Get Occurences per day for the last month
+            occurences_per_day = database.get_sql_data(
+                """SELECT
+                    EXTRACT('day' FROM o.time) AS day,
+                    COUNT(o.time) AS amount
+                FROM occurence o
+                WHERE o.time BETWEEN date_trunc('day', now()- interval '1 month') AND now()
+                GROUP BY DATE_TRUNC('day', o.time)
+                ORDER BY DATE_TRUNC('day', o.time) ASC
+                """
+            )
+            for day in occurences_per_day:
+                data.append((day[0], day[1]))
+        case 'year':
+            # Get Occurences per day for the last year
+            occurences_per_day = database.get_sql_data(
+                """SELECT
+                    EXTRACT('month' FROM o.time) AS day,
+                    COUNT(o.time) AS amount
+                FROM occurence o
+                WHERE o.time BETWEEN date_trunc('day', now()- interval '1 year') AND now()
+                GROUP BY DATE_TRUNC('day', o.time)
+                ORDER BY DATE_TRUNC('day', o.time) ASC
+                """
+            )
+            ## Add (name of month, value) if it's the first day of the month, else just ("", value)
+            current_month=""
+            for day in occurences_per_day:
+                if current_month != day[0]:
+                    current_month = day[0]
+                    data.append((day[0], day[1]))
+                else:
+                    data.append(("", day[1]))
+        case 'life':
+            occurences_per_day = database.get_sql_data(
+                """SELECT
+                    EXTRACT('month' FROM o.time) AS day,
+                    COUNT(o.time) AS amount
+                FROM occurence o
+                GROUP BY DATE_TRUNC('day', o.time)
+                ORDER BY DATE_TRUNC('day', o.time) ASC
+                """
+            )
+    return data
+    
 
 def location_map_data() -> str:
     """Data for location map"""
