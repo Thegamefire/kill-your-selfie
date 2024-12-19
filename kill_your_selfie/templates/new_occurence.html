@@ -2,34 +2,48 @@
 {% set page_title = "New occurence" %}
 
 {% block content %}
-<div>
-  <form method="POST" action="/new-occurence">
+<div class="card">
+  <div class="card-body">
+    <form method="POST" action="/new-occurence" class="needs-validation" novalidate>
+      <div class="row">
 
-    <input type="datetime-local" name="time" required>
-    <input type="text" name="target" placeholder="Target..." list="targets" autofocus="" required>
-    <input type="text" name="location" list="locations" placeholder="Location..."/>
-    <input type="text" name="context" placeholder="Context..." required>
-    <button type="submit">Submit</button>
+        <div class="col-md mb-3">
+          <label class="form-label">Time</label>
+          <input type="datetime-local" class="form-control" name="time" required>
+          <div class="invalid-feedback">Please fill out this field.</div>
+        </div>
 
-    <datalist id="targets">
-      {% for option in target_options %}
-      <option>{{ option }}</option>
-      {% endfor %}
-    </datalist>
-    <datalist id="locations">
-      {% for option in location_options %}
-      <option>{{ option }}</option>
-      {% endfor %}
-    </datalist>
-  </form>
+        <div class="col-md mb-3">
+          <label class="form-label">Target</label>
+          <input type="text" class="form-control" name="target" placeholder="Type to search..." list="targets" required>
+          <div class="invalid-feedback">Please fill out this field.</div>
+        </div>
 
-  {% with messages = get_flashed_messages()%}
-    {% if messages%}
-      {% for message in messages%}
-        <p>{{message}}</p>
-      {%endfor%}
-    {%endif%}
-  {%endwith%}
+        <div class="col-md mb-3">
+          <label class="form-label">Location</label>
+          <input type="text" class="form-control" name="location" list="locations" placeholder="Type to search..." required>
+          <div class="invalid-feedback">Please fill out this field.</div>
+        </div>
+
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Context</label>
+        <input type="text" class="form-control" name="context">
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+
+      <datalist id="targets">
+        {% for option in target_options %}
+        <option>{{ option }}</option>
+        {% endfor %}
+      </datalist>
+      <datalist id="locations">
+        {% for option in location_options %}
+        <option>{{ option }}</option>
+        {% endfor %}
+      </datalist>
+    </form>
+  </div>
 </div>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
