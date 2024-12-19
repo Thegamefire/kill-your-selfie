@@ -1,50 +1,45 @@
-{% extends "base.html" %}
+{% extends "form.html" %}
+
 {% set page_title = "New occurence" %}
+{% set form_method = "POST" %}
+{% set form_action = "/new-occurence" %}
 
-{% block content %}
-<div class="card">
-  <div class="card-body">
-    <form method="POST" action="/new-occurence" class="needs-validation" novalidate>
-      <div class="row">
+{% block form_content %}
+  <div class="row">
 
-        <div class="col-md mb-3">
-          <label class="form-label">Time</label>
-          <input type="datetime-local" class="form-control" name="time" required>
-          <div class="invalid-feedback">Please fill out this field.</div>
-        </div>
+    <div class="col-md mb-3">
+      <label class="form-label">Time</label>
+      <input type="datetime-local" class="form-control" name="time" required>
+      <div class="invalid-feedback">Please fill out this field.</div>
+    </div>
 
-        <div class="col-md mb-3">
-          <label class="form-label">Target</label>
-          <input type="text" class="form-control" name="target" placeholder="Type to search..." list="targets" required>
-          <div class="invalid-feedback">Please fill out this field.</div>
-        </div>
+    <div class="col-md mb-3">
+      <label class="form-label">Target</label>
+      <input type="text" class="form-control" name="target" placeholder="Type to search..." list="targets" required>
+      <div class="invalid-feedback">Please fill out this field.</div>
+    </div>
 
-        <div class="col-md mb-3">
-          <label class="form-label">Location</label>
-          <input type="text" class="form-control" name="location" list="locations" placeholder="Type to search..." required>
-          <div class="invalid-feedback">Please fill out this field.</div>
-        </div>
+    <div class="col-md mb-3">
+      <label class="form-label">Location</label>
+      <input type="text" class="form-control" name="location" list="locations" placeholder="Type to search..." required>
+      <div class="invalid-feedback">Please fill out this field.</div>
+    </div>
 
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Context</label>
-        <input type="text" class="form-control" name="context">
-      </div>
-      <button type="submit" class="btn btn-primary">Submit</button>
-
-      <datalist id="targets">
-        {% for option in target_options %}
-        <option>{{ option }}</option>
-        {% endfor %}
-      </datalist>
-      <datalist id="locations">
-        {% for option in location_options %}
-        <option>{{ option }}</option>
-        {% endfor %}
-      </datalist>
-    </form>
   </div>
-</div>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-{% endblock content %}
+  <div class="mb-3">
+    <label class="form-label">Context</label>
+    <input type="text" class="form-control" name="context">
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+
+  <datalist id="targets">
+    {% for option in target_options %}
+    <option>{{ option }}</option>
+    {% endfor %}
+  </datalist>
+  <datalist id="locations">
+    {% for option in location_options %}
+    <option>{{ option }}</option>
+    {% endfor %}
+  </datalist>
+{% endblock form_content %}
