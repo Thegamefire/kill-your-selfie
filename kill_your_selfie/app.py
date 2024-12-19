@@ -79,6 +79,7 @@ def logout():
 @login_required
 def home():
     """home page"""
+    flash("test")
     return render_template(
         "index.html",
         active="home",
@@ -89,6 +90,7 @@ def home():
 
 @app.route('/new-user', methods=['GET', 'POST'])
 @login_required
+@auth.admin_required
 def new_user():
     """new user register page"""
     if request.method == "POST":
@@ -127,6 +129,7 @@ def new_occurence():
 
 @app.route("/map-location", methods=["GET", "POST"])
 @login_required
+@auth.admin_required
 def map_location():
     """page to map locations to geographical coordinates"""
     location_options = occurences.get_location_options()
