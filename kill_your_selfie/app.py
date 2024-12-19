@@ -48,10 +48,13 @@ def index():
         return redirect(url_for('login'))
 
 
-@app.route("/base")
+@app.route("/debug-ui")
 def basepage():
     """displays the base html template"""
-    return render_template("base.html")
+    flash("Debug ui")
+    flash("another message")
+    flash("oooOOOoo")
+    return render_template("form.html")
 
 
 @app.route("/login", methods=["GET", "POST"])
