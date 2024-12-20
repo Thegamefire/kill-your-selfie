@@ -48,10 +48,13 @@ def index():
         return redirect(url_for('login'))
 
 
-@app.route("/base")
+@app.route("/debug-ui")
 def basepage():
     """displays the base html template"""
-    return render_template("base.html")
+    flash("Debug ui")
+    flash("another message")
+    flash("oooOOOoo")
+    return render_template("form.html")
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -60,7 +63,7 @@ def login():
     if request.method == "POST":
         try:
             auth.authenticate_user(request.form.get("username"), request.form.get("password"))
-            return redirect(url_for("home") if (next_url := url_for(request.args.get("next"))) is None else next_url)
+            return redirect(url_for("home") if (next_url := request.args.get("next")) is None else url_for(next_url))
         except auth.AuthenticationError as e:
             flash(f"Error: {e}")
 
@@ -81,6 +84,7 @@ def home():
     """home page"""
     return render_template(
         "index.html",
+        active="home",
         weekly_bar_data=stats.weekly_bar_data(),
         monthly_line_data=stats.line_data('month'),
         yearly_line_data=stats.line_data('year'),
@@ -91,6 +95,7 @@ def home():
 
 @app.route('/new-user', methods=['GET', 'POST'])
 @login_required
+@auth.admin_required
 def new_user():
     """new user register page"""
     if request.method == "POST":
@@ -102,7 +107,7 @@ def new_user():
         )
         flash("User added")
 
-    return render_template("new_user.html")
+    return render_template("new_user.html", active="new-user")
 
 
 @app.route("/new-occurence", methods=["GET", "POST"])
@@ -121,6 +126,7 @@ def new_occurence():
 
     return render_template(
         "new_occurence.html",
+        active="new-occurence",
         location_options=occurences.get_location_options(),
         target_options=occurences.get_target_options(),
     )
@@ -128,6 +134,7 @@ def new_occurence():
 
 @app.route("/map-location", methods=["GET", "POST"])
 @login_required
+@auth.admin_required
 def map_location():
     """page to map locations to geographical coordinates"""
     location_options = occurences.get_location_options()
@@ -144,5 +151,6 @@ def map_location():
 
     return render_template(
         "map_location.html",
-        loc_options = location_options
+        active="map-location",
+        loc_options = location_options,
     )
