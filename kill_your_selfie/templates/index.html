@@ -4,10 +4,23 @@
 
 {% block content %}
     <h1> Homepage </h1>
-    <div class="graph-canvas" >
-    <canvas id="bargraph-weekly" data-chart='{{ weekly_bar_data|tojson }}'></canvas>
+    <div class="graph-canvas">
+        <canvas id="bargraph-weekly" data-chart='{{ weekly_bar_data|tojson }}'></canvas>
     </div>
-    <div class="graph-canvas" >
+    <div class="graph-canvas">
+        <canvas id="linegraph-monthly" data-chart='{{ monthly_line_data|tojson }}'></canvas>
+    </div>
+    <div class="graph-canvas">
+        <canvas id="linegraph-yearly" data-chart='{{ yearly_line_data|tojson }}'></canvas>
+    </div>
+    <div class="graph-canvas">
+        <canvas id="linegraph-lifetime" data-chart='{{ lifetime_line_data|tojson }}'></canvas>
+    </div>
+    <div class="graph-canvas">
         {{ location_map|safe }}
     </div>
 {% endblock content %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='scripts/line-graphs.js') }}"></script>
+{%endblock scripts%}

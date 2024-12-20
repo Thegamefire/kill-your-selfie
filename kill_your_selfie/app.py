@@ -82,6 +82,9 @@ def home():
     return render_template(
         "index.html",
         weekly_bar_data=stats.weekly_bar_data(),
+        monthly_line_data=stats.line_data('month'),
+        yearly_line_data=stats.line_data('year'),
+        lifetime_line_data=stats.line_data('life'),
         location_map=stats.location_map_data(),
     )
 

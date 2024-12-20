@@ -60,10 +60,10 @@ def line_data(range) -> list:
             # Get Occurences per day for the last month
             occurences_per_day = database.get_sql_data(
                 """SELECT
-                    EXTRACT('day' FROM o.time) AS day,
+                    EXTRACT('day' FROM DATE_TRUNC('day', o.time)) AS day,
                     COUNT(o.time) AS amount
                 FROM occurence o
-                WHERE o.time BETWEEN date_trunc('day', now()- interval '1 month') AND now()
+                WHERE o.time BETWEEN DATE_TRUNC('day', now()- interval '2 months') AND DATE_TRUNC('day', now()- interval '1 month' + interval '1 day')
                 GROUP BY DATE_TRUNC('day', o.time)
                 ORDER BY DATE_TRUNC('day', o.time) ASC
                 """
@@ -74,10 +74,10 @@ def line_data(range) -> list:
             # Get Occurences per day for the last year
             occurences_per_day = database.get_sql_data(
                 """SELECT
-                    EXTRACT('month' FROM o.time) AS day,
+                    TO_CHAR(DATE_TRUNC('day', o.time), 'Month') AS month_of_day,
                     COUNT(o.time) AS amount
                 FROM occurence o
-                WHERE o.time BETWEEN date_trunc('day', now()- interval '1 year') AND now()
+                WHERE o.time BETWEEN DATE_TRUNC('day', now()- interval '2 years') AND DATE_TRUNC('day', now() - interval '1 year' + interval '1 day')
                 GROUP BY DATE_TRUNC('day', o.time)
                 ORDER BY DATE_TRUNC('day', o.time) ASC
                 """
@@ -93,13 +93,21 @@ def line_data(range) -> list:
         case 'life':
             occurences_per_day = database.get_sql_data(
                 """SELECT
-                    EXTRACT('month' FROM o.time) AS day,
+                    EXTRACT('year' FROM DATE_TRUNC('day', o.time)) AS year,
+                    TO_CHAR(DATE_TRUNC('day', o.time), 'Month') AS month_of_day,
                     COUNT(o.time) AS amount
                 FROM occurence o
                 GROUP BY DATE_TRUNC('day', o.time)
                 ORDER BY DATE_TRUNC('day', o.time) ASC
                 """
             )
+            current_year=""
+            for day in occurences_per_day:
+                if current_year != day[0]:
+                    current_year = day[0]
+                    data.append((day[0], day[2]))
+                else:
+                    data.append(("", day[2]))
     return data
     
 
