@@ -14,6 +14,7 @@
 {% endblock header_items %}
 
 {% block content %}
+{% if current_user.admin %}
   <div class="row row-cols-1 row-cols-lg-2 g-4">
 
     <div class="col">
@@ -37,4 +38,9 @@
     </div>
 
   </div>
+{% else %}
+  <h2 class="h5"><em>Under construction...</em></h2>
+  <p>Come back later to see some statistics!</p>
+  <img alt="Construction Cat" src="https://cutecatsinhats.com/wp-content/uploads/2016/01/construction-cat.jpg" height="400px">
+{% endif %}
 {% endblock content %}
