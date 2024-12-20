@@ -1,21 +1,40 @@
-{% extends "base.html" %}
+{% extends "skeleton.html" %}
+
 {% set page_title = "Log in" %}
 
-{% block content %}
+{% block extra_head_tags %}
+  <link href="{{ url_for('static',filename='styles/login.css' ) }}" rel="stylesheet">
+{% endblock extra_head_tags %}
 
-<div>
-  <form method="POST" action="{{ url_for('login', next=request.args.get('next')) }}">
-    <input type="text" name="username" placeholder="Your Username" autofocus="">
-    <input type="password" name="password" placeholder="Your Password">
-    <button type="submit">Login</button>
-  </form>
-  {% with messages = get_flashed_messages()%}
-{% if messages%}
-  {% for message in messages%}
-  <p>{{message}}</p>
-  {%endfor%}
-  {%endif%}
-  {%endwith%}
-</div>
+{% block base %}
+  <body class="d-flex align-items-center py-4 bg-body-tertiary">
+    <main class="form-signin w-100 m-auto">
+      <form method="POST" action="{{ url_for('login', next=request.args.get('next')) }}">
+        <img src="{{ url_for('static', filename='assets/images/knife.gif') }}" alt="" height="40" width="83.3" class="d-inline-block align-text-top mb-3">
+        {% with messages = get_flashed_messages()%}
+          {% if messages%}
+            {% for message in messages%}
+              <div class="alert alert-info alert-dismissible fade show">
+                {{message}}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {%endfor%}
+          {%endif%}
+        {%endwith%}
+        <h1 class="h4 mb-3 fw-normal">Log in to Kill Your Selfie</h1>
 
-{% endblock %}
+        <div class="form-floating">
+          <input type="username" class="form-control" name="username" placeholder autofocus>
+          <label for="floatingInput">Username</label>
+        </div>
+        <div class="form-floating">
+          <input type="password" class="form-control" name="password" placeholder>
+          <label for="floatingPassword">Password</label>
+        </div>
+
+        <button class="btn btn-primary w-100 py-2" type="submit">Log in</button>
+        <p class="mt-5 mb-3 text-body-secondary">© 2024 Thegamefire and lolcat.jpg</p>
+      </form>
+    </main>
+  </body>
+{% endblock base %}

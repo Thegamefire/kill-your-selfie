@@ -2,11 +2,22 @@
     --bs-primary:var(--bs-pink) !important;
 }
 
-.navbar-brand {
-    transform: skewX(-15deg);
+.kysie-brand {
+    transform: skewX(-15deg) !important;
     margin: -10rem 1rem;
     font-weight: bold;
     text-shadow: .1em .1em var(--bs-primary);
+	padding-top: var(--bs-navbar-brand-padding-y);
+	padding-bottom: var(--bs-navbar-brand-padding-y);
+	margin-right: var(--bs-navbar-brand-margin-end);
+	font-size: var(--bs-navbar-brand-font-size);
+	color: var(--bs-navbar-brand-color);
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.kysie-brand:focus, .kysie-brand:hover {
+	color: var(--bs-navbar-brand-hover-color);
 }
 
 .graph-canvas {
