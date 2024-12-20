@@ -1,13 +1,46 @@
 {% extends "base.html" %}
+{% set page_title = "Home" %}
 
-{% block title %}Kill Your Selfie - Home{% endblock title %}
+{% block header_items %}
+  <div class="btn-toolbar mb-2 mb-md-0">
+    <div class="btn-group me-2">
+      <button type="button" class="btn btn-sm btn-outline-secondary">Example</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary">buttons</button>
+    </div>
+    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-1">
+      This week
+    </button>
+  </div>
+{% endblock header_items %}
 
 {% block content %}
-    <h1> Homepage </h1>
-    <div class="graph-canvas" >
-    <canvas id="bargraph-weekly" data-chart='{{ weekly_bar_data|tojson }}'></canvas>
+{% if current_user.admin %}
+  <div class="row row-cols-1 row-cols-lg-2 g-4">
+
+    <div class="col">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Occurences per day</h5>
+          <p class="card-text">Amount of times you've said the forbidden words each day</p>
+            <canvas id="bargraph-weekly" data-chart='{{ weekly_bar_data|tojson }}'></canvas>
+        </div>
+      </div>
     </div>
-    <div class="graph-canvas" >
-        {{ location_map|safe }}
+
+    <div class="col">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Heatmap</h5>
+          <p class="card-text">Heatmap of the places where you've said the forbidden words</p>
+            {{ location_map|safe }}
+        </div>
+      </div>
     </div>
+
+  </div>
+{% else %}
+  <h2 class="h5"><em>Under construction...</em></h2>
+  <p>Come back later to see some statistics!</p>
+  <img alt="Construction Cat" src="https://cutecatsinhats.com/wp-content/uploads/2016/01/construction-cat.jpg" height="400px">
+{% endif %}
 {% endblock content %}
