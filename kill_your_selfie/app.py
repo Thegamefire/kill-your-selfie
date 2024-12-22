@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, logout_user, login_required, current_user
 
 from .config import Config
-from . import database, models, auth, stats, occurences
+from . import database, models, auth, stats, occurrences
 
 
 login_manager = LoginManager()
@@ -110,12 +110,12 @@ def new_user():
     return render_template("new_user.html", active="new-user")
 
 
-@app.route("/new-occurence", methods=["GET", "POST"])
+@app.route("/new-occurrence", methods=["GET", "POST"])
 @login_required
-def new_occurence():
-    """page to register a new occurence"""
+def new_occurrence():
+    """page to register a new occurrence"""
     if request.method == "POST":
-        occurences.add_occurence(
+        occurrences.add_occurrence(
             # exception handling for datetime is not really needed since
             # form has built in validation
             datetime.strptime(request.form.get("time"), "%Y-%m-%dT%H:%M"),
@@ -125,10 +125,10 @@ def new_occurence():
         )
 
     return render_template(
-        "new_occurence.html",
-        active="new-occurence",
-        location_options=occurences.get_location_options(),
-        target_options=occurences.get_target_options(),
+        "new_occurrence.html",
+        active="new-occurrence",
+        location_options=occurrences.get_location_options(),
+        target_options=occurrences.get_target_options(),
     )
 
 
@@ -137,13 +137,13 @@ def new_occurence():
 @auth.admin_required
 def map_location():
     """page to map locations to geographical coordinates"""
-    location_options = occurences.get_location_options()
+    location_options = occurrences.get_location_options()
     location_options.sort()
     if len(location_options) == 0:
         location_options=[""] # Add at least one element to the list so it is iterable
 
     if request.method == 'POST':
-        occurences.map_location(
+        occurrences.map_location(
             request.form.get("location"),
             float(request.form.get("latitude")),
             float(request.form.get("longitude")),

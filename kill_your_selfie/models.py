@@ -13,24 +13,24 @@ class Location(db.Model):
     latitude = db.Column(db.Double, unique=False, nullable=True)
     longitude = db.Column(db.Double, unique=False, nullable=True)
 
-    occurences = db.relationship("Occurence", back_populates="location")
+    occurrences = db.relationship("Occurrence", back_populates="location")
 
     def __repr__(self):
         return f"<Location {self.label}>"
 
-class Occurence(db.Model):
+class Occurrence(db.Model):
     """a time when 'kill yourself' was said"""
-    __tablename__ = "occurence"
+    __tablename__ = "occurrence"
 
     time = db.Column(db.TIMESTAMP, primary_key=True)
     location_label = db.Column(db.String(80), db.ForeignKey('location.label'))
     target = db.Column(db.String(80), unique=False, nullable=False)
     context = db.Column(db.String(), unique=False, nullable=False)
 
-    location = db.relationship("Location", back_populates="occurences")
+    location = db.relationship("Location", back_populates="occurrences")
 
     def __repr__(self):
-        return f"<Occurence {self.time}>"
+        return f"<Occurrence {self.time}>"
 
 
 class User(UserMixin, db.Model):
