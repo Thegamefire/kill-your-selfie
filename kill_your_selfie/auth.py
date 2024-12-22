@@ -69,6 +69,24 @@ def create_user(username: str, email: str, password: str, admin: bool = False) -
     database.commit()
 
 
+def update_user(user_id: str, username: str, email: str = None, password: str = None) -> None:
+    """Creates a new user. Raises UserExistsError when a user with
+    the given username already exists.
+    Use UserExistsError.message to retrieve the error message.
+    """
+    user = models.User.query.get(user_id)
+    if username:
+        user.username = username
+    if email:
+        user.email = email
+    if password:
+        pw_hash = _bcrypt.generate_password_hash(password).decode(
+            "utf-8"
+        )
+        user.password = pw_hash
+    database.commit()
+
+
 def admin_required(func):
     """Decorator to make a page only accessible to admins"""
     def admin_gate(*args, **kwargs):

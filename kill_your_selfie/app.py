@@ -98,6 +98,12 @@ def home():
 def user_settings():
     """user settings page"""
     if request.method == "POST":
+        auth.update_user(
+            current_user.id,
+            request.form.get("username"),
+            request.form.get("email"),
+            request.form.get("password"),
+        )
         flash("Settings updated")
     return render_template("user_settings.html", active="user-settings")
 
