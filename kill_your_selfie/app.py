@@ -98,13 +98,17 @@ def home():
 def user_settings():
     """user settings page"""
     if request.method == "POST":
-        auth.update_user(
-            current_user.id,
-            request.form.get("username"),
-            request.form.get("email"),
-            request.form.get("password"),
-        )
-        flash("Settings updated")
+        try:
+            auth.update_user(
+                current_user.id,
+                request.form.get("username"),
+                request.form.get("email"),
+                request.form.get("new-password"),
+                request.form.get("current-password"),
+            )
+            flash("Settings updated")
+        except auth.AuthenticationError as exc:
+            flash(str(exc))
     return render_template("user_settings.html", active="user-settings")
 
 
