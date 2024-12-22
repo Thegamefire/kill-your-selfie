@@ -19,9 +19,9 @@
     </ul>
     <ul class="navbar-nav me-autp mb-2 mb-lg-0">
       <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">{{ current_user.username }}</a>
+        <a class="nav-link dropdown-toggle {%if active in ("user-settings, ")%}active{%endif%}" href="#" data-bs-toggle="dropdown" aria-expanded="false">{{ current_user.username }}</a>
         <ul class="dropdown-menu dropdown-menu-end">
-          <li><a class="dropdown-item" href="#">Settings</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('user_settings') }}">Settings</a></li>
           <li><a class="dropdown-item text-danger" href={{ url_for('logout') }}>Log out</a></li>
         </ul>
       </li>

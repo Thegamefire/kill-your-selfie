@@ -93,6 +93,15 @@ def home():
     )
 
 
+@app.route('/user-settings', methods=['GET', 'POST'])
+@login_required
+def user_settings():
+    """user settings page"""
+    if request.method == "POST":
+        flash("Settings updated")
+    return render_template("user_settings.html", active="user-settings")
+
+
 @app.route('/new-user', methods=['GET', 'POST'])
 @login_required
 @auth.admin_required
