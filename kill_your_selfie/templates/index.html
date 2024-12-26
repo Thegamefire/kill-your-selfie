@@ -20,21 +20,51 @@
     <div class="col">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title">Occurences per day</h5>
+          <h5 class="card-title">Occurrences per day</h5>
           <p class="card-text">Amount of times you've said the forbidden words each day</p>
             <canvas id="bargraph-weekly" data-chart='{{ weekly_bar_data|tojson }}'></canvas>
         </div>
       </div>
     </div>
 
-    <div class="col">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">Heatmap</h5>
-          <p class="card-text">Heatmap of the places where you've said the forbidden words</p>
-            {{ location_map|safe }}
+      <div class="col">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Occurrences per day (Monthly View)</h5>
+            <p class="card-text">Amount of times you've said the forbidden words each day</p>
+            <canvas id="linegraph-monthly" data-chart='{{ monthly_line_data|tojson }}'></canvas>
+          </div>
         </div>
       </div>
+
+      <div class="col">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Occurrences per month</h5>
+            <p class="card-text">Amount of times you've said the forbidden words each month</p>
+            <canvas id="linegraph-yearly" data-chart='{{ yearly_line_data|tojson }}'></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Occurrences per day (Lifetime View)</h5>
+            <p class="card-text">Amount of times you've said the forbidden words each day</p>
+            <canvas id="linegraph-lifetime" data-chart='{{ lifetime_line_data|tojson }}'></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Heatmap</h5>
+            <p class="card-text">Heatmap of the places where you've said the forbidden words</p>
+              {{ location_map|safe }}
+          </div>
+        </div>
     </div>
 
   </div>
@@ -44,3 +74,8 @@
   <img alt="Construction Cat" src="https://cutecatsinhats.com/wp-content/uploads/2016/01/construction-cat.jpg" height="400px">
 {% endif %}
 {% endblock content %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='scripts/line-graphs.js') }}"></script>
+<script src="{{ url_for('static', filename='scripts/graphs.js') }}"></script>
+{%endblock scripts%}
