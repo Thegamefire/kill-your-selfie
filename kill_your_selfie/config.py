@@ -1,5 +1,5 @@
 # pylint: disable=C0111
-from os import environ, urandom
+from os import environ
 from dotenv import load_dotenv
 
 
@@ -13,4 +13,4 @@ class Config:
     DB_HOST = environ.get("DB_HOST")
     DB_PORT = environ.get("DB_PORT")
     DB_DATABASE = environ.get("DB_DATABASE")
-    SECRET = secret if (secret := environ.get("KYSIE_DEBUG_SECRET")) else urandom(32)
+    SECRET = environ.get("FLASK_SECRET")
