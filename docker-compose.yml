@@ -1,14 +1,38 @@
 services:
+  app:
+    build:
+      context: .
+      target: production
+    restart: on-failure
+    depends_on:
+      - db
+    ports:
+      - 8000:8000
+    environment:
+      - DB_USERNAME=postgres
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=killyourselfie
+      - DB_PASSWORD
+      - FLASK_SECRET
+    networks:
+      - killyourselfie
+
   db:
     image: postgres:16.0-alpine
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=killyourselfie
     ports:
       - 5432:5432
+    networks:
+      - killyourselfie
     volumes:
-      - db:/var/lib/postgresql/data 
- 
+      - db:/var/lib/postgresql/data
+
+networks:
+  killyourselfie:
+
 volumes:
   db:

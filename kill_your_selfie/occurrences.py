@@ -1,4 +1,4 @@
-"""Occurence related functions"""
+"""Occurrence related functions"""
 import datetime
 from . import models, database
 
@@ -21,28 +21,28 @@ def get_location_options() -> list:
 def get_target_options() -> list:
     """Get history for target field"""
     target_options = []
-    for occurence in models.Occurence.query.all():
-        if not occurence.target in target_options:
-            target_options.append(occurence.target)
+    for occurrence in models.Occurrence.query.all():
+        if not occurrence.target in target_options:
+            target_options.append(occurrence.target)
     return target_options
 
 
-def add_occurence(time: datetime.datetime, location: str, target: str, context: str) -> None:
-    """Add a new occurence"""
-    new_occurence = models.Occurence(
+def add_occurrence(time: datetime.datetime, location: str, target: str, context: str) -> None:
+    """Add a new occurrence"""
+    new_occurrence = models.Occurrence(
         time=time,
         location_label=location,
         target=target,
         context=context,
     )
-    if new_occurence.location_label not in get_location_options():
+    if new_occurrence.location_label not in get_location_options():
         new_location = models.Location(
-            label=new_occurence.location_label,
+            label=new_occurrence.location_label,
             latitude=None,
             longitude=None
         )
         database.add(new_location)
-    database.add(new_occurence)
+    database.add(new_occurrence)
     database.commit()
 
 
