@@ -53,9 +53,9 @@ def weekly_bar_data() -> list:
 
     return data
 
-def line_data(range) -> list:
+def line_data(time_range) -> list:
     data=[]
-    match range:
+    match time_range:
         case 'month':
             # Get Occurrences per day for the last month
             occurrences_per_day = database.get_sql_data(
@@ -75,7 +75,8 @@ def line_data(range) -> list:
             # Get Occurrrences per month for the last year
             occurrences_per_month = database.get_sql_data(
                 """
-                SELECT to_char(DATE_TRUNC('month', o.time), 'Month') AS MONTH,
+                SELECT TO_CHAR(DATE_TRUNC('month', o.time), 'Year') AS year,
+                    to_char(DATE_TRUNC('month', o.time), 'Month') AS month,
                     COUNT(o.time) AS amount
                 FROM occurrence o
                 WHERE o.time >= DATE_TRUNC('month', now() - interval '1 years')
@@ -83,8 +84,21 @@ def line_data(range) -> list:
                 ORDER BY DATE_TRUNC('month', o.time) ASC
                 """
             )
-            for month in occurrences_per_month:
-                data.append((month[0], month[1]))
+            last_date=None
+            for year, month, amount in occurrences_per_month:
+                print(f"Error [{month}]")
+                month_index = int(datetime.strptime(month.strip(), '%B').month)-1
+
+                if last_date and month_index!=(last_date[1]+1)%12:
+                    if (year > last_date[0]):
+                        month_index+=12
+                    
+                    for i in range(last_date[1]+1, month_index):
+                        data.append((datetime.strftime(datetime(1900, (i)%12+1, 1), '%B'), 0))
+                        
+                last_date = (year, month_index)
+                data.append((month, amount))
+                
         case 'life':
             occurrences_per_day = database.get_sql_data(
                 """
