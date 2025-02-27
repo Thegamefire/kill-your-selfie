@@ -124,7 +124,7 @@ def statistics_overview_data() -> dict:
         FROM minimum_date md
         """
     )
-    data["Average Per Day"] = total_amount[0][0]/total_days[0][0]
+    data["Average Per Day"] = round(total_amount[0][0]/total_days[0][0], 3)
     ## Day With Most Occurences
     max_days_query = database.get_sql_data(
         """
@@ -138,7 +138,7 @@ def statistics_overview_data() -> dict:
     )
     max_days={}
     for day in max_days_query:
-        max_days[day[0]]=day[1]
+        max_days[datetime.strftime(day[0], '%Y-%m-%d')]=day[1]
     data["Most Popular Days"]=max_days
     ## Most Popular Location
     most_popular_locations_query = database.get_sql_data(
