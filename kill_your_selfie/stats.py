@@ -131,6 +131,6 @@ def location_map_data() -> str:
             # Add Latitude, Longitude and Amount
             data.append((location[1], location[2], location[3]))
 
-    location_map = folium.Map([51.05, 3.73], zoom_start=6)
+    location_map = folium.Map([51.05, 3.43], zoom_start=9)
     folium.plugins.HeatMap(data).add_to(location_map)
     return location_map.get_root()._repr_html_()  # TODO: use different function because _repr_html_ is protected
