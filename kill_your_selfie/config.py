@@ -13,4 +13,4 @@ class Config:
     DB_HOST = environ.get("DB_HOST")
     DB_PORT = environ.get("DB_PORT")
     DB_DATABASE = environ.get("DB_DATABASE")
-    SECRET = environ.get("SECRET")
+    SECRET = environ.get("FLASK_SECRET")

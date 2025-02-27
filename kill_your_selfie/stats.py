@@ -72,6 +72,9 @@ def location_map_data() -> str:
 
 def statistics_overview_data() -> dict:
     """Returns dictionary with data for statistics overview"""
+    
+    # TODO: Format Values as Strings!!!
+    
     data = {}
     ## Get Streaks of sequential dates on which it occured
     streaks = database.get_sql_data(
@@ -179,6 +182,7 @@ def statistics_overview_data() -> dict:
         WHERE weeks.week = extract('week' FROM now())-1
         """
     )
-    data["Difference with Last Week"] = week_gains[0][0]
-
-    print(data)
+    if week_gains!=[] and week_gains[0]!=[]:
+        data["Difference with Last Week"] = week_gains[0][0]
+        
+    return data

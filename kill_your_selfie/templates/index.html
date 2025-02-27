@@ -7,6 +7,18 @@
     <div class="graph-canvas" >
     <canvas id="bargraph-weekly" data-chart='{{ weekly_bar_data|tojson }}'></canvas>
     </div>
+
+    <div class="statistics-table">
+        <table>
+            {% for key, value in stat_table_data.items() %}
+            <tr>
+                <td>{{ key }}</td>
+                <td>{{ value }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
     <div class="graph-canvas" >
         {{ location_map|safe }}
     </div>
