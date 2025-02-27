@@ -75,12 +75,12 @@ def line_data(range) -> list:
             # Get Occurrrences per month for the last year
             occurrences_per_month = database.get_sql_data(
                 """
-                SELECT to_char(date_trunc('month', o.time), 'Month') AS MONTH,
+                SELECT to_char(DATE_TRUNC('month', o.time), 'Month') AS MONTH,
                     COUNT(o.time) AS amount
                 FROM occurrence o
-                WHERE o.time >= date_trunc('month', now() - interval '1 years')
-                GROUP BY date_trunc('month', o.time)
-                ORDER BY date_trunc('month', o.time) ASC
+                WHERE o.time >= DATE_TRUNC('month', now() - interval '1 years')
+                GROUP BY DATE_TRUNC('month', o.time)
+                ORDER BY DATE_TRUNC('month', o.time) ASC
                 """
             )
             for month in occurrences_per_month:
