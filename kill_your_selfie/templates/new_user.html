@@ -4,18 +4,6 @@
 {% set form_method = "POST" %}
 {% set form_action = "/new-user" %}
 
-{% block content_dis %}
-    <div>
-      <form method="POST" action="/new-user">
-        <input type="text" name="username" placeholder="New Username" autofocus="">
-        <input type="text" name="email" placeholder="New email">
-        <input type="password" name="password" placeholder="New Password">
-        <label>Admin?</label><input type="checkbox" name="admin-state">
-        <button type="submit">Register</button>
-      </form>
-    </div>
-{% endblock content_dis %}
-
 {% block form_content %}
   <div class="row">
 
@@ -28,7 +16,7 @@
     <div class="col-md mb-3">
       <label class="form-label">Email</label>
       <input type="text" class="form-control" name="email" required>
-      <div class="invalid-feedback">Please fill out this field.</div>
+      <div class="invalid-feedback">Please fill out this field with a valid email address.</div>
     </div>
 
     <div class="col-md mb-3">

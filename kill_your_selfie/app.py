@@ -93,6 +93,25 @@ def home():
     )
 
 
+@app.route('/user-settings', methods=['GET', 'POST'])
+@login_required
+def user_settings():
+    """user settings page"""
+    if request.method == "POST":
+        try:
+            auth.update_user(
+                current_user.id,
+                request.form.get("username"),
+                request.form.get("email"),
+                request.form.get("new-password"),
+                request.form.get("current-password"),
+            )
+            flash("Settings updated")
+        except auth.AuthenticationError as exc:
+            flash(str(exc))
+    return render_template("user_settings.html", active="user-settings")
+
+
 @app.route('/new-user', methods=['GET', 'POST'])
 @login_required
 @auth.admin_required
