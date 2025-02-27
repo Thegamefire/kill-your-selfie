@@ -69,6 +69,27 @@ def create_user(username: str, email: str, password: str, admin: bool = False) -
     database.commit()
 
 
+def update_user(user_id: str, username: str, email: str = None, new_password: str = None, current_password: str = None) -> None:
+    """Creates a new user. Raises AuthenticationError when user
+    tries changing their password, and the current password is incorrect.
+    """
+    user = models.User.query.get(user_id)
+    # if user entered new password: check if current password is correct
+    if new_password and not _bcrypt.check_password_hash(user.password, current_password):
+        raise AuthenticationError("Your current password was incorrect.")
+
+    if username:
+        user.username = username
+    if email:
+        user.email = email
+    if new_password:
+        pw_hash = _bcrypt.generate_password_hash(new_password).decode(
+            "utf-8"
+        )
+        user.password = pw_hash
+    database.commit()
+
+
 def admin_required(func):
     """Decorator to make a page only accessible to admins"""
     def admin_gate(*args, **kwargs):
