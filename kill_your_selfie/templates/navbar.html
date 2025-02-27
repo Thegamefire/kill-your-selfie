@@ -5,7 +5,7 @@
         <a class="nav-link {%if active == "home"%}active{%endif%}" aria-current="page" href="{{ url_for('home') }}">Home</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link {%if active == "new-occurence"%}active{%endif%}" href="{{ url_for('new_occurence') }}">New occurence</a>
+        <a class="nav-link {%if active == "new-occurrence"%}active{%endif%}" href="{{ url_for('new_occurrence') }}">New occurrence</a>
       </li>
       <li class="nav-item dropdown">
         {% if current_user.admin %}

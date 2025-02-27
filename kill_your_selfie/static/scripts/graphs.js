@@ -45,4 +45,4 @@ function createSimpleBarGraph(canvas, name, data) {
 lastWeekData=document.getElementById("bargraph-weekly").getAttribute("data-chart")
 lastWeekData=JSON.parse(lastWeekData);
 
-createSimpleBarGraph(document.getElementById('bargraph-weekly'), 'Occurences In The Last 7 Days', lastWeekData);
+createSimpleBarGraph(document.getElementById('bargraph-weekly'), 'Occurrences In The Last 7 Days', lastWeekData);
