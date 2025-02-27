@@ -148,6 +148,7 @@ def new_occurrence():
         active="new-occurrence",
         location_options=occurrences.get_location_options(),
         target_options=occurrences.get_target_options(),
+        all_occurrences=stats.all_occurences(),
     )
 
 

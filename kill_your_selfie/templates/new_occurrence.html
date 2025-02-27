@@ -43,3 +43,20 @@
     {% endfor %}
   </datalist>
 {% endblock form_content %}
+
+
+{% block othercontent %}
+{% if current_user.admin %}
+<table>
+  {% for time, location, target, context in all_occurrences %}
+    <tr>
+      <td>{{ time }}</td>
+      <td>{{ location }}</td>
+      <td>{{ target }}</td>
+      <td>{{ context }}</td>
+    </tr>
+
+  {% endfor %}
+</table>
+{% endif %}
+{% endblock othercontent %}

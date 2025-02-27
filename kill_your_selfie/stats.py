@@ -134,3 +134,16 @@ def location_map_data() -> str:
     location_map = folium.Map([51.05, 3.73], zoom_start=6)
     folium.plugins.HeatMap(data).add_to(location_map)
     return location_map.get_root()._repr_html_()  # TODO: use different function because _repr_html_ is protected
+
+
+
+def all_occurences() -> list:
+    data = database.get_sql_data(
+        """
+        SELECT *
+        FROM occurrence
+        """
+    )
+    data = list(data)
+    data.insert(0, ('time', 'location_label', 'target', 'context'))
+    return data
