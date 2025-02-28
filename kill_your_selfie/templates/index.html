@@ -47,15 +47,6 @@
         </div>
       </div>
 
-      <div class="col">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Occurrences per day (Lifetime View)</h5>
-            <p class="card-text">Amount of times you've said the forbidden words each day</p>
-            <canvas id="linegraph-lifetime" data-chart='{{ lifetime_line_data|tojson }}'></canvas>
-          </div>
-        </div>
-      </div>
 
       <div class="col">
         <div class="card">
@@ -77,5 +68,5 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='scripts/line-graphs.js') }}"></script>
-<script src="{{ url_for('static', filename='scripts/graphs.js') }}"></script>
+<script src="{{ url_for('static', filename='scripts/bar-graphs.js') }}"></script>
 {%endblock scripts%}

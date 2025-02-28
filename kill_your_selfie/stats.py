@@ -53,13 +53,14 @@ def weekly_bar_data() -> list:
 
     return data
 
-def line_data(range) -> list:
+def line_data(time_range) -> list:
     data=[]
-    match range:
+    match time_range:
         case 'month':
             # Get Occurrences per day for the last month
             occurrences_per_day = database.get_sql_data(
-                """SELECT
+                """
+                SELECT
                     EXTRACT('day' FROM DATE_TRUNC('day', o.time)) AS day,
                     COUNT(o.time) AS amount
                 FROM occurrence o
@@ -71,43 +72,32 @@ def line_data(range) -> list:
             for day in occurrences_per_day:
                 data.append((day[0], day[1]))
         case 'year':
-            # Get Occurrences per day for the last year
-            occurrences_per_day = database.get_sql_data(
-                """SELECT
-                    TO_CHAR(DATE_TRUNC('day', o.time), 'Month') AS month_of_day,
+            # Get Occurrrences per month for the last year
+            occurrences_per_month = database.get_sql_data(
+                """
+                SELECT TO_CHAR(DATE_TRUNC('month', o.time), 'Year') AS year,
+                    to_char(DATE_TRUNC('month', o.time), 'Month') AS month,
                     COUNT(o.time) AS amount
                 FROM occurrence o
-                WHERE o.time BETWEEN DATE_TRUNC('day', now()- interval '2 years') AND DATE_TRUNC('day', now() - interval '1 year' + interval '1 day')
-                GROUP BY DATE_TRUNC('day', o.time)
-                ORDER BY DATE_TRUNC('day', o.time) ASC
+                WHERE o.time >= DATE_TRUNC('month', now() - interval '1 years')
+                GROUP BY DATE_TRUNC('month', o.time)
+                ORDER BY DATE_TRUNC('month', o.time) ASC
                 """
             )
-            ## Add (name of month, value) if it's the first day of the month, else just ("", value)
-            current_month=""
-            for day in occurrences_per_day:
-                if current_month != day[0]:
-                    current_month = day[0]
-                    data.append((day[0], day[1]))
-                else:
-                    data.append(("", day[1]))
-        case 'life':
-            occurrences_per_day = database.get_sql_data(
-                """SELECT
-                    EXTRACT('year' FROM DATE_TRUNC('day', o.time)) AS year,
-                    TO_CHAR(DATE_TRUNC('day', o.time), 'Month') AS month_of_day,
-                    COUNT(o.time) AS amount
-                FROM occurrence o
-                GROUP BY DATE_TRUNC('day', o.time)
-                ORDER BY DATE_TRUNC('day', o.time) ASC
-                """
-            )
-            current_year=""
-            for day in occurrences_per_day:
-                if current_year != day[0]:
-                    current_year = day[0]
-                    data.append((day[0], day[2]))
-                else:
-                    data.append(("", day[2]))
+            last_date=None
+            for year, month, amount in occurrences_per_month:
+                month_index = int(datetime.strptime(month.strip(), '%B').month)-1
+
+                if last_date and month_index!=(last_date[1]+1)%12:
+                    if (year > last_date[0]):
+                        month_index+=12
+                    
+                    for i in range(last_date[1]+1, month_index):
+                        data.append((datetime.strftime(datetime(1900, (i)%12+1, 1), '%B'), 0))
+                        
+                last_date = (year, month_index)
+                data.append((month, amount))
+                    
     return data
 
 
@@ -115,7 +105,8 @@ def location_map_data() -> str:
     """Data for location map"""
     data = []
     occurrences_per_location = database.get_sql_data(
-        """SELECT
+        """
+        SELECT
             l.label,
             l.latitude,
             l.longitude,
