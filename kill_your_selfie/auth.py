@@ -10,6 +10,7 @@ _bcrypt = Bcrypt()
 
 class AuthenticationError(Exception):
     """Authentication error"""
+
     def __init__(self, message):
         self.message = message
         super().__init__(message)
@@ -20,6 +21,7 @@ class AuthenticationError(Exception):
 
 class UserExistsError(Exception):
     """User already exists error"""
+
     def __init__(self, *args):
         super().__init__(*args)
 
@@ -59,6 +61,8 @@ def create_user(username: str, email: str, password: str, admin: bool = False) -
     pw_hash = _bcrypt.generate_password_hash(password).decode(
         "utf-8"
     )
+    # noinspection PyArgumentList
+    # ^ to supress errors caused by bug in pycharm
     new_user = models.User(
         username=username,
         email=email,
@@ -69,7 +73,8 @@ def create_user(username: str, email: str, password: str, admin: bool = False) -
     database.commit()
 
 
-def update_user(user_id: str, username: str, email: str = None, new_password: str = None, current_password: str = None) -> None:
+def update_user(user_id: str, username: str, email: str = None, new_password: str = None,
+                current_password: str = None) -> None:
     """Creates a new user. Raises AuthenticationError when user
     tries changing their password, and the current password is incorrect.
     """
@@ -92,10 +97,12 @@ def update_user(user_id: str, username: str, email: str = None, new_password: st
 
 def admin_required(func):
     """Decorator to make a page only accessible to admins"""
+
     def admin_gate(*args, **kwargs):
         if current_user.admin:
             return func(*args, **kwargs)
         else:
             abort(401, description="You need to be admin to access this page")
+
     admin_gate.__name__ = func.__name__
     return admin_gate
