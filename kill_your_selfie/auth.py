@@ -31,26 +31,28 @@ def init_bcrypt(app: Flask) -> None:
     _bcrypt.init_app(app)
 
 
-def authenticate_user(username: str, password: str) -> None:
-    """Attempts to authenticate a user.
-    Returns:
-    - `success` if the user got logged in;
-    - `err_wrong_password` if the password is wrong;
-    - `err_not_found` if a user with the username doesn't exist.
-    Raises AuthenticationError when the user can't be logged in.
-    - Use AuthenticationError.message to retrieve the error message.
+def authenticate_user(username: str, password: str) -> tuple[str, bool]:
+    """
+    Attempts to authenticate a user. Returns a tuple with 2 elements:
+
+    - the success/error message (str);
+    - a boolean indicating whether the authentication was successful.
+
+    :param username: username of user to authenticate
+    :param password: bcrypt hash of password
+    :return: tuple of: (success/error message: string, successfuly authenticated: bool)
     """
     # Finds a user by filtering for the username
     user = models.User.query.filter_by(username=username).first()
     if user is None:
-        raise AuthenticationError("User with that username doesn't exist")
+        return "User with that username doesn't exist", False
     # Check if the password entered is the same as the user's password
     if _bcrypt.check_password_hash(user.password, password):
         # Use the login_user method to log in the user
         login_user(user, remember=True)
-        return 'success'
+        return "Login successful", True
 
-    raise AuthenticationError("Wrong password")
+    return "Wrong password", False
 
 
 def create_user(username: str, email: str, password: str, admin: bool = False) -> None:
