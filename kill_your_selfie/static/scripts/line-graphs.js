@@ -23,6 +23,7 @@ function createSimpleLineGraph(canvas, name, data) {
           }
         ]
       };
+      
       const config = {
         type: 'line',
         data: chart_data,
@@ -41,10 +42,9 @@ function createSimpleLineGraph(canvas, name, data) {
       new Chart(canvas, config)
     }
 
+
     lastMonthData=JSON.parse(document.getElementById("linegraph-monthly").getAttribute("data-chart"));
     lastYearData=JSON.parse(document.getElementById("linegraph-yearly").getAttribute("data-chart"));
-    LifetimeData=JSON.parse(document.getElementById("linegraph-lifetime").getAttribute("data-chart"));
 
     createSimpleLineGraph(document.getElementById('linegraph-monthly'), 'Occurrences This Day', lastMonthData);
     createSimpleLineGraph(document.getElementById('linegraph-yearly'), 'Occurrences This Month', lastYearData);
-    createSimpleLineGraph(document.getElementById('linegraph-lifetime'), 'Occurrences This Year', LifetimeData);

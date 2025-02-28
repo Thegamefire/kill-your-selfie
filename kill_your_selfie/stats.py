@@ -86,7 +86,6 @@ def line_data(time_range) -> list:
             )
             last_date=None
             for year, month, amount in occurrences_per_month:
-                print(f"Error [{month}]")
                 month_index = int(datetime.strptime(month.strip(), '%B').month)-1
 
                 if last_date and month_index!=(last_date[1]+1)%12:
@@ -98,26 +97,7 @@ def line_data(time_range) -> list:
                         
                 last_date = (year, month_index)
                 data.append((month, amount))
-                
-        case 'life':
-            occurrences_per_day = database.get_sql_data(
-                """
-                SELECT
-                    EXTRACT('year' FROM DATE_TRUNC('day', o.time)) AS year,
-                    TO_CHAR(DATE_TRUNC('day', o.time), 'Month') AS month_of_day,
-                    COUNT(o.time) AS amount
-                FROM occurrence o
-                GROUP BY DATE_TRUNC('day', o.time)
-                ORDER BY DATE_TRUNC('day', o.time) ASC
-                """
-            )
-            current_year=""
-            for day in occurrences_per_day:
-                if current_year != day[0]:
-                    current_year = day[0]
-                    data.append((day[0], day[2]))
-                else:
-                    data.append(("", day[2]))
+                    
     return data
 
 
