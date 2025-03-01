@@ -3,6 +3,9 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text as sql_txt
 
+from typing import Sequence
+from sqlalchemy.engine import Row
+
 db = SQLAlchemy()
 
 add = db.session.add
@@ -15,6 +18,6 @@ def register_app(app: Flask) -> None:
     db.init_app(app)
 
 
-def get_sql_data(query) -> None:
+def get_sql_data(query) -> Sequence[Row]:
     """get data from raw SQL query"""
     return db.session.execute(sql_txt(query)).fetchall()
