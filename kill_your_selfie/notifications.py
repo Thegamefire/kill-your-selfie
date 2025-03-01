@@ -24,3 +24,11 @@ class NtfyController:
             tags="newoccurrence",
             priority="3" # If priority is lower than 3, the notification won't make any sound
             )
+        
+    def sendNewUserNotification(self, username:str, isadmin:bool,email:str):
+        self.sendNotification(
+            title=f"User {username} was given access to kys",
+            data=f"admin: {isadmin}, email: {email}",
+            tags="newuser",
+            priority="4"
+        )
