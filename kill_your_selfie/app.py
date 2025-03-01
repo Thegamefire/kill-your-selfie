@@ -24,6 +24,8 @@ models.create_tables(app)
 
 if Config.NTFY_ENDPOINT:
     ntfy_controller = notifications.NtfyController(Config.NTFY_AUTH, Config.NTFY_ENDPOINT)
+else:
+    ntfy_controller = notifications.DummyNtfyController()
 
 
 @login_manager.user_loader
