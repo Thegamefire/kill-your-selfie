@@ -24,8 +24,8 @@ app.config["SECRET_KEY"] = Config.SECRET
 database.register_app(app)
 models.create_tables(app)
 
-ntfy_controller = notifications.NtfyController(Config.NTFY_AUTH, Config.NTFY_ENDPOINT)
-
+if (Config.NTFY_ENDPOINT):
+    ntfy_controller = notifications.NtfyController(Config.NTFY_AUTH, Config.NTFY_ENDPOINT)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -134,14 +134,19 @@ def new_user():
 def new_occurrence():
     """page to register a new occurrence"""
     if request.method == "POST":
+        time=datetime.strptime(request.form.get("time"), "%Y-%m-%dT%H:%M")
+        location=request.form.get("location")
+        target=request.form.get("target")
+        context=request.form.get("context")
         occurrences.add_occurrence(
             # exception handling for datetime is not really needed since
             # form has built in validation
-            datetime.strptime(request.form.get("time"), "%Y-%m-%dT%H:%M"),
-            request.form.get("location"),
-            request.form.get("target"),
-            request.form.get("context"),
+            time,
+            location,
+            target,
+            context,
         )
+        ntfy_controller.sendNewOccurrenceNotification({"time":time, "location":location,"target":target,"context":context}, current_user)
 
     return render_template(
         "new_occurrence.html",
