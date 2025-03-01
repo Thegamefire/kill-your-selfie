@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, logout_user, login_required, current_user
 
 from .config import Config
-from . import database, models, auth, stats, occurrences
+from . import database, models, auth, stats, occurrences, notifications
 
 
 login_manager = LoginManager()
@@ -24,6 +24,7 @@ app.config["SECRET_KEY"] = Config.SECRET
 database.register_app(app)
 models.create_tables(app)
 
+ntfy_controller = notifications.NtfyController(Config.NTFY_AUTH, Config.NTFY_ENDPOINT)
 
 
 @login_manager.user_loader

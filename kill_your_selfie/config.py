@@ -14,3 +14,5 @@ class Config:
     DB_PORT = environ.get("DB_PORT")
     DB_DATABASE = environ.get("DB_DATABASE")
     SECRET = environ.get("FLASK_SECRET")
+    NTFY_AUTH = environ.get("NTFY_AUTH")
+    NTFY_ENDPOINT = environ.get("NTFY_ENDPOINT")
