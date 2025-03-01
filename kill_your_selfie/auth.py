@@ -2,6 +2,7 @@
 from flask import Flask, abort
 from flask_bcrypt import Bcrypt
 from flask_login import login_user, current_user
+from sqlalchemy.exc import IntegrityError
 
 from . import models, database
 
@@ -19,13 +20,6 @@ class AuthenticationError(Exception):
         return f"{self.message}"
 
 
-class UserExistsError(Exception):
-    """User already exists error"""
-
-    def __init__(self, *args):
-        super().__init__(*args)
-
-
 def init_bcrypt(app: Flask) -> None:
     """initialise bcrypt with app (calls init_app on Bcrypt object)"""
     _bcrypt.init_app(app)
@@ -40,7 +34,7 @@ def authenticate_user(username: str, password: str) -> tuple[str, bool]:
 
     :param username: username of user to authenticate
     :param password: bcrypt hash of password
-    :return: tuple of: (success/error message: string, successfuly authenticated: bool)
+    :return: tuple of: (success/error message: string, successfully authenticated: bool)
     """
     # Finds a user by filtering for the username
     user = models.User.query.filter_by(username=username).first()
@@ -55,10 +49,13 @@ def authenticate_user(username: str, password: str) -> tuple[str, bool]:
     return "Wrong password", False
 
 
-def create_user(username: str, email: str, password: str, admin: bool = False) -> None:
-    """Creates a new user. Raises UserExistsError when a user with
-    the given username already exists.
-    Use UserExistsError.message to retrieve the error message.
+def create_user(username: str, email: str, password: str, admin: bool = False) -> tuple[str, bool]:
+    """Creates a new user. Returns: error message (string), success (boolean)
+    :param username: username of user to create
+    :param email: email of user to create
+    :param password: bcrypt hash of password
+    :param admin: whether the user is an admin
+    :return: tuple of: (success/error message: string, successfully authenticated: bool)
     """
     pw_hash = _bcrypt.generate_password_hash(password).decode(
         "utf-8"
@@ -71,8 +68,13 @@ def create_user(username: str, email: str, password: str, admin: bool = False) -
         password=pw_hash,
         admin=admin,
     )
-    database.add(new_user)
-    database.commit()
+    try:
+        database.add(new_user)
+        database.commit()
+        return "User added", True
+    except IntegrityError:
+        database.rollback()
+        return "User with that username or email already exists", False
 
 
 def update_user(user_id: str, username: str, email: str = None, new_password: str = None,
