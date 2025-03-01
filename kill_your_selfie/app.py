@@ -118,17 +118,18 @@ def user_settings():
 def new_user():
     """new user register page"""
     if request.method == "POST":
-        newuser_isadmin = request.form.get("admin-state") == "on"
-        newuser_email = request.form.get("email")
-        newuser_name = request.form.get("username")
-        auth.create_user(
-            newuser_name,
-            newuser_email,
+        new_user_name = request.form.get("username")
+        new_user_email = request.form.get("email")
+        new_user_is_admin = request.form.get("admin-state") == "on"
+        message, success = auth.create_user(
+            new_user_name,
+            new_user_email,
             request.form.get("password"),
-            newuser_isadmin,
+            new_user_is_admin,
         )
-        ntfy_controller.sendNewUserNotification(newuser_name, newuser_isadmin, newuser_email)
-        flash("User added")
+        if success:
+            ntfy_controller.sendNewUserNotification(new_user_name, new_user_is_admin, new_user_email)
+        flash(message)
 
     return render_template("new_user.html", active="new-user")
 
