@@ -122,4 +122,5 @@ def location_map_data() -> str:
 
     location_map = folium.Map([51.05, 3.43], zoom_start=9)
     folium.plugins.HeatMap(data).add_to(location_map)
+    # noinspection PyProtectedMember
     return location_map.get_root()._repr_html_()  # TODO: use different function because _repr_html_ is protected

@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, logout_user, login_required, current_user
 
 from .config import Config
-from . import database, models, auth, stats, occurrences
+from . import database, models, auth, stats, occurrences, notifications
 
 login_manager = LoginManager()
 
@@ -21,6 +21,9 @@ app.config["SECRET_KEY"] = Config.SECRET
 
 database.register_app(app)
 models.create_tables(app)
+
+if Config.NTFY_ENDPOINT:
+    ntfy_controller = notifications.NtfyController(Config.NTFY_AUTH, Config.NTFY_ENDPOINT)
 
 
 @login_manager.user_loader
@@ -115,12 +118,16 @@ def user_settings():
 def new_user():
     """new user register page"""
     if request.method == "POST":
+        newuser_isadmin = request.form.get("admin-state") == "on"
+        newuser_email = request.form.get("email")
+        newuser_name = request.form.get("username")
         auth.create_user(
-            request.form.get("username"),
-            request.form.get("email"),
+            newuser_name,
+            newuser_email,
             request.form.get("password"),
-            request.form.get("admin-state") == "on",
+            newuser_isadmin,
         )
+        ntfy_controller.sendNewUserNotification(newuser_name, newuser_isadmin, newuser_email)
         flash("User added")
 
     return render_template("new_user.html", active="new-user")
@@ -131,13 +138,20 @@ def new_user():
 def new_occurrence():
     """page to register a new occurrence"""
     if request.method == "POST":
+        time = datetime.strptime(request.form.get("time"), "%Y-%m-%dT%H:%M")
+        location = request.form.get("location")
+        target = request.form.get("target")
+        context = request.form.get("context")
         occurrences.add_occurrence(
             # exception handling for datetime is not really needed since
             # form has built in validation
-            datetime.strptime(request.form.get("time"), "%Y-%m-%dT%H:%M"),
-            request.form.get("location"),
-            request.form.get("target"),
-            request.form.get("context"),
+            time,
+            location,
+            target,
+            context,
+        )
+        ntfy_controller.sendNewOccurrenceNotification(
+            {"time": time, "location": location, "target": target, "context": context}, current_user
         )
 
     return render_template(
