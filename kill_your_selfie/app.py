@@ -22,7 +22,7 @@ app.config["SECRET_KEY"] = Config.SECRET
 database.register_app(app)
 models.create_tables(app)
 
-if (Config.NTFY_ENDPOINT):
+if Config.NTFY_ENDPOINT:
     ntfy_controller = notifications.NtfyController(Config.NTFY_AUTH, Config.NTFY_ENDPOINT)
 
 
