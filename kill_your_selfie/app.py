@@ -127,7 +127,7 @@ def new_user():
             request.form.get("password"),
             newuser_isadmin,
         )
-        ntfy_controller.sendNewUserNotification(newuser_name,newuser_isadmin, newuser_email)
+        ntfy_controller.sendNewUserNotification(newuser_name, newuser_isadmin, newuser_email)
         flash("User added")
 
     return render_template("new_user.html", active="new-user")
@@ -138,10 +138,10 @@ def new_user():
 def new_occurrence():
     """page to register a new occurrence"""
     if request.method == "POST":
-        time=datetime.strptime(request.form.get("time"), "%Y-%m-%dT%H:%M")
-        location=request.form.get("location")
-        target=request.form.get("target")
-        context=request.form.get("context")
+        time = datetime.strptime(request.form.get("time"), "%Y-%m-%dT%H:%M")
+        location = request.form.get("location")
+        target = request.form.get("target")
+        context = request.form.get("context")
         occurrences.add_occurrence(
             # exception handling for datetime is not really needed since
             # form has built in validation
@@ -150,7 +150,9 @@ def new_occurrence():
             target,
             context,
         )
-        ntfy_controller.sendNewOccurrenceNotification({"time":time, "location":location,"target":target,"context":context}, current_user)
+        ntfy_controller.sendNewOccurrenceNotification(
+            {"time": time, "location": location, "target": target, "context": context}, current_user
+        )
 
     return render_template(
         "new_occurrence.html",
