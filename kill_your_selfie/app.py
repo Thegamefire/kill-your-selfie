@@ -8,13 +8,11 @@ from flask_login import LoginManager, logout_user, login_required, current_user
 from .config import Config
 from . import database, models, auth, stats, occurrences
 
-
 login_manager = LoginManager()
 
 app = Flask(__name__)
 login_manager.init_app(app)
 auth.init_bcrypt(app)
-
 
 app.config["SQLALCHEMY_DATABASE_URI"] = (
     f"postgresql+psycopg2://{Config.DB_USERNAME}:{Config.DB_PASSWORD}@{Config.DB_HOST}:{Config.DB_PORT}/{Config.DB_DATABASE}"
@@ -25,11 +23,11 @@ database.register_app(app)
 models.create_tables(app)
 
 
-
 @login_manager.user_loader
 def load_user(user_id):
     """loads a user probably"""
     return models.User.query.get(user_id)
+
 
 @login_manager.unauthorized_handler
 def unauthorized_callback():
@@ -61,11 +59,11 @@ def basepage():
 def login():
     """login page"""
     if request.method == "POST":
-        try:
-            auth.authenticate_user(request.form.get("username"), request.form.get("password"))
+        message, success = auth.authenticate_user(request.form.get("username"), request.form.get("password"))
+        if success:
             return redirect(url_for("home") if (next_url := request.args.get("next")) is None else url_for(next_url))
-        except auth.AuthenticationError as e:
-            flash(f"Error: {e}")
+        else:
+            flash(f"Error: {message}")
 
     return render_template("login.html")
 
@@ -158,7 +156,7 @@ def map_location():
     location_options = occurrences.get_location_options()
     location_options.sort()
     if len(location_options) == 0:
-        location_options=[""] # Add at least one element to the list so it is iterable
+        location_options = [""]  # Add at least one element to the list so it is iterable
 
     if request.method == 'POST':
         occurrences.map_location(
@@ -170,5 +168,5 @@ def map_location():
     return render_template(
         "map_location.html",
         active="map-location",
-        loc_options = location_options,
+        loc_options=location_options,
     )
