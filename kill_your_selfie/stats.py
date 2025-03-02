@@ -21,10 +21,7 @@ def weekly_bar_data() -> list:
     )
     # filter selection on days from last 7 days
     for day in occurrences_per_day:
-        if (
-            day[0] >= (datetime.now() - timedelta(days=7)).date()
-            and day[0] <= datetime.now().date()
-        ):
+        if (datetime.now() - timedelta(days=7)).date() <= day[0] <= datetime.now().date():
             # add tuple consisting of name of weekday and amount of uses on that day
             data.append((day[0].strftime("%A"), day[1]))
 
@@ -44,8 +41,8 @@ def weekly_bar_data() -> list:
     weekdays = weekdays[first_day:] + weekdays[:first_day]
 
     i = 0
-    while i < len(weekdays): # add empty weekdays that don't appear in the database
-        if i>=len(data):
+    while i < len(weekdays):  # add empty weekdays that don't appear in the database
+        if i >= len(data):
             data.append((weekdays[i], 0))
         elif weekdays[i] != data[i][0]:
             data.insert(i, (weekdays[i], 0))
@@ -53,8 +50,9 @@ def weekly_bar_data() -> list:
 
     return data
 
+
 def line_data(time_range) -> list:
-    data=[]
+    data = []
     match time_range:
         case 'month':
             # Get Occurrences per day for the last month
@@ -84,20 +82,20 @@ def line_data(time_range) -> list:
                 ORDER BY DATE_TRUNC('month', o.time) ASC
                 """
             )
-            last_date=None
+            last_date = None
             for year, month, amount in occurrences_per_month:
-                month_index = int(datetime.strptime(month.strip(), '%B').month)-1
+                month_index = int(datetime.strptime(month.strip(), '%B').month) - 1
 
-                if last_date and month_index!=(last_date[1]+1)%12:
-                    if (year > last_date[0]):
-                        month_index+=12
-                    
-                    for i in range(last_date[1]+1, month_index):
-                        data.append((datetime.strftime(datetime(1900, (i)%12+1, 1), '%B'), 0))
-                        
+                if last_date and month_index != (last_date[1] + 1) % 12:
+                    if year > last_date[0]:
+                        month_index += 12
+
+                    for i in range(last_date[1] + 1, month_index):
+                        data.append((datetime.strftime(datetime(1900, i % 12 + 1, 1), '%B'), 0))
+
                 last_date = (year, month_index)
                 data.append((month, amount))
-                    
+
     return data
 
 
@@ -118,10 +116,11 @@ def location_map_data() -> str:
         """
     )
     for location in occurrences_per_location:
-        if location[1] is not None and location[2] is not None: # Coordinates are in database
+        if location[1] is not None and location[2] is not None:  # Coordinates are in database
             # Add Latitude, Longitude and Amount
             data.append((location[1], location[2], location[3]))
 
     location_map = folium.Map([51.05, 3.43], zoom_start=9)
     folium.plugins.HeatMap(data).add_to(location_map)
+    # noinspection PyProtectedMember
     return location_map.get_root()._repr_html_()  # TODO: use different function because _repr_html_ is protected

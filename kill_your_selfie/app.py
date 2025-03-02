@@ -6,15 +6,13 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, logout_user, login_required, current_user
 
 from .config import Config
-from . import database, models, auth, stats, occurrences
-
+from . import database, models, auth, stats, occurrences, notifications
 
 login_manager = LoginManager()
 
 app = Flask(__name__)
 login_manager.init_app(app)
 auth.init_bcrypt(app)
-
 
 app.config["SQLALCHEMY_DATABASE_URI"] = (
     f"postgresql+psycopg2://{Config.DB_USERNAME}:{Config.DB_PASSWORD}@{Config.DB_HOST}:{Config.DB_PORT}/{Config.DB_DATABASE}"
@@ -24,12 +22,17 @@ app.config["SECRET_KEY"] = Config.SECRET
 database.register_app(app)
 models.create_tables(app)
 
+if Config.NTFY_ENDPOINT:
+    ntfy_controller = notifications.NtfyController(Config.NTFY_AUTH, Config.NTFY_ENDPOINT)
+else:
+    ntfy_controller = notifications.DummyNtfyController()
 
 
 @login_manager.user_loader
 def load_user(user_id):
     """loads a user probably"""
     return models.User.query.get(user_id)
+
 
 @login_manager.unauthorized_handler
 def unauthorized_callback():
@@ -61,11 +64,11 @@ def basepage():
 def login():
     """login page"""
     if request.method == "POST":
-        try:
-            auth.authenticate_user(request.form.get("username"), request.form.get("password"))
+        message, success = auth.authenticate_user(request.form.get("username"), request.form.get("password"))
+        if success:
             return redirect(url_for("home") if (next_url := request.args.get("next")) is None else url_for(next_url))
-        except auth.AuthenticationError as e:
-            flash(f"Error: {e}")
+        else:
+            flash(f"Error: {message}")
 
     return render_template("login.html")
 
@@ -117,13 +120,18 @@ def user_settings():
 def new_user():
     """new user register page"""
     if request.method == "POST":
-        auth.create_user(
-            request.form.get("username"),
-            request.form.get("email"),
+        new_user_name = request.form.get("username")
+        new_user_email = request.form.get("email")
+        new_user_is_admin = request.form.get("admin-state") == "on"
+        message, success = auth.create_user(
+            new_user_name,
+            new_user_email,
             request.form.get("password"),
-            request.form.get("admin-state") == "on",
+            new_user_is_admin,
         )
-        flash("User added")
+        if success:
+            ntfy_controller.sendNewUserNotification(new_user_name, new_user_is_admin, new_user_email)
+        flash(message)
 
     return render_template("new_user.html", active="new-user")
 
@@ -133,13 +141,20 @@ def new_user():
 def new_occurrence():
     """page to register a new occurrence"""
     if request.method == "POST":
+        time = datetime.strptime(request.form.get("time"), "%Y-%m-%dT%H:%M")
+        location = request.form.get("location")
+        target = request.form.get("target")
+        context = request.form.get("context")
         occurrences.add_occurrence(
             # exception handling for datetime is not really needed since
             # form has built in validation
-            datetime.strptime(request.form.get("time"), "%Y-%m-%dT%H:%M"),
-            request.form.get("location"),
-            request.form.get("target"),
-            request.form.get("context"),
+            time,
+            location,
+            target,
+            context,
+        )
+        ntfy_controller.sendNewOccurrenceNotification(
+            {"time": time, "location": location, "target": target, "context": context}, current_user
         )
 
     return render_template(
@@ -158,7 +173,7 @@ def map_location():
     location_options = occurrences.get_location_options()
     location_options.sort()
     if len(location_options) == 0:
-        location_options=[""] # Add at least one element to the list so it is iterable
+        location_options = [""]  # Add at least one element to the list so it is iterable
 
     if request.method == 'POST':
         occurrences.map_location(
@@ -170,5 +185,5 @@ def map_location():
     return render_template(
         "map_location.html",
         active="map-location",
-        loc_options = location_options,
+        loc_options=location_options,
     )
