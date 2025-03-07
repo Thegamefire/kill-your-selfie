@@ -6,43 +6,50 @@
 
 {% block base %}
   <body>
-    <nav class="navbar border-bottom navbar-expand-lg fixed-top bg-dark">
-      <div class="container-fluid">
-        {% include "brand.html" %}
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          {% include "navbar.html" %}
-        </div>
+  <nav class="navbar border-bottom navbar-expand-lg fixed-top bg-dark p-1 ps-2">
+    <div class="container-fluid">
+      {#        {% include "brand.html" %}#}
+      <a class="navbar-brand mt-0 mb-0" href="{{ url_for('index') }}">
+        <img src="{{ url_for('static',filename='assets/logo/kys_dark.svg' ) }}" width="auto" height="32"
+             class="d-inline-block align-center m-0" alt="Bootstrap" loading="lazy">
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+              aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        {% include "navbar.html" %}
       </div>
-    </nav>
+    </div>
+  </nav>
 
-    <main class="container">
-      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">{{ page_title }}</h1>
-        {% block header_items %}
-        {% endblock header_items %}
-      </div>
-      {% with messages = get_flashed_messages()%}
-        {% if messages%}
-          {% for message in messages%}
-            <div class="alert alert-info alert-dismissible fade show">
-              {{message}}
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-          {%endfor%}
-        {%endif%}
-      {%endwith%}
-      {% block content %}
+  <main class="container">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+      <h1 class="h2">{{ page_title }}</h1>
+      {% block header_items %}
+      {% endblock header_items %}
+    </div>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-info alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    {% block content %}
 
-      {% endblock content %}
-    </main>
+    {% endblock content %}
+  </main>
   </body>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-{% block scripts %}
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+          crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  {% block scripts %}
 
-{%endblock scripts%}
+  {% endblock scripts %}
 
 {% endblock base %}
